@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Card from '../components/Card';
+import Card from '../../components/Card';
 import { PiChartLineUpThin, PiChartLineDownThin } from "react-icons/pi";
 import rec from "../assets/rec.png";
 import dol from "../assets/dollar.png";
 import exp from "../assets/expense.png";
 import sent from "../assets/sent.png";
-import LineChart from '../components/LineChart';
-import DoughnutChart from '../components/DoughnutChart';
+import LineChart from '../../components/LineChart';
+import DoughnutChart from '../../components/DoughnutChart';
 import axios from 'axios';
 
 const Home = () => {

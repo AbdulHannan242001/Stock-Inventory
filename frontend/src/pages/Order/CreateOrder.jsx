@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import CreateForm from '../components/CreateForm';
+import CreateForm from '../../components/CreateForm';
 
 const CreateOrder = () => {
     const [order, setOrder] = useState({

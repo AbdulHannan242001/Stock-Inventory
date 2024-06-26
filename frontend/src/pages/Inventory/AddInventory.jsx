@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import CreateForm from '../components/CreateForm';
+import CreateForm from '../../components/CreateForm';
 
 const AddInventory = () => {
     const navigate = useNavigate();
