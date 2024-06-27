@@ -143,36 +143,36 @@ const AdvancedReporting = () => {
     };
 
     return (
-        <div className="w-full p-4 bg-white rounded-lg shadow-lg">
-            <h1 className="text-3xl mb-4 font-semibold text-center text-primary-dark">Advanced Reporting</h1>
+        <div className="w-2/4 mx-auto p-4 pt-6 md:p-6 md:pt-12 bg-white shadow-lg rounded-lg">
+            <h1 className="text-3xl font-semibold text-center text-primary-dark">Financial Reporting</h1>
             <form className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Report Type</label>
+                <div className='mb-4'>
+                    <label className="block text-sm font-semibold mb-2">Report Type</label>
                     <select
                         value={reportType}
                         onChange={handleReportTypeChange}
-                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        className="w-full p-2 pl-10 text-sm text-neutral-mediumGray bg-neutral-lightGray border"
                     >
                         <option value="profit-loss">Profit and Loss Statement</option>
                         <option value="balance-sheet">Balance Sheet</option>
                     </select>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                <div className='mb-4'>
+                    <label className="block text-sm font-semibold mb-2">Start Date</label>
                     <input
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        className="w-full p-2 pl-10 text-sm text-neutral-mediumGray bg-neutral-lightGray border"
                     />
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">End Date</label>
+                <div className='mb-4'>
+                    <label className="block text-sm font-semibold mb-2">End Date</label>
                     <input
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        className="w-full p-2 pl-10 text-sm text-neutral-mediumGray bg-neutral-lightGray border"
                     />
                 </div>
                 <div className="flex justify-end space-x-2">
