@@ -7,8 +7,7 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     deliveryDate: {
-        type : Date,
-        required: true
+        type: Date,
     },
     status: {
         type: String,
@@ -18,42 +17,46 @@ const orderSchema = new mongoose.Schema({
     deliveryStatus: {
         type: String,
         enum: ['On Time', 'Over Due', 'Incomplete'],
-        required: true
     },
     vendorName: {
-
+        type: String,
+        required: true
     },
     contact: {
-
+        type: String,
+        required: true
     },
-    paymentMethod: {
-
+    payMethod: {
+        type: String,
+        enum: ["COD", "Bank Transfer", "E Transfer"],
     },
-    paymentStatus: {
-
+    payStatus: {
+        type: String,
+        enum: ["Paid", "Unpaid"],
     },
     transactionId: {
-
+        type: String,
     },
-    shippingMethod: {
-
-    },
-    trackingNumber: {
-
-    },
-    carrier: {
-
-    },
-    estimatedDelivery: {
-
-    },
-    notes: {
-
+    estimatedDDate: {
+        type: Date,
     },
     items: [{
-
-    }],
-    totalPrice: {
-
-    }
+        name: {
+            type: String,
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        },
+        unitCost: {
+            type: Number,
+            required: true
+        }
+    }]
+}, {
+    timestamps: true
 });
+
+
+export default mongoose.model('Order', orderSchema);

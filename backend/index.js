@@ -26,6 +26,7 @@ app.use(cors({
 app.use('/api/auth', AuthRoute);
 app.use('/api/inventory', InventoryRoute);
 app.use('/api/invoice', InvoiceRoute);
+// app.use()
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

@@ -11,8 +11,6 @@ const CreateOrder = () => {
         status: 'Pending',
         deliveryStatus: 'On Time',
         vendorName: '',
-        shippingAddress: '',
-        billingAddress: '',
         contact: '',
         paymentMethod: 'Credit Card',
         paymentStatus: 'Paid',
@@ -66,11 +64,11 @@ const CreateOrder = () => {
     };
 
     const orderFormFields = [
-        { name: 'deliveryDate', label: 'Delivery Date', type: 'date', initialValue: order.deliveryDate },
         { name: 'vendorName', label: 'Vendor Name', type: 'text', initialValue: order.vendorName },
         { name: 'contact', label: 'Contact', type: 'email', initialValue: order.contact },
         { name: 'paymentMethod', label: 'Payment Method', type: 'select', options: ['Credit Card', 'PayPal', 'Bank Transfer', 'Cash On Delivery'], initialValue: order.paymentMethod },
         { name: 'paymentStatus', label: 'Payment Status', type: 'select', options: ['Paid', 'Pending'], initialValue: order.paymentStatus },
+        { name: 'estimatedDelivery', label: 'Expected Delivery', type: 'date', initialValue: order.estimatedDelivery },
     ];
 
     return (
@@ -78,39 +76,62 @@ const CreateOrder = () => {
             <CreateForm formTitle="New Order" formFields={orderFormFields} onSubmit={handleSubmit} />
             <div className='mt-4'>
                 <h2 className='text-xl font-semibold'>Items</h2>
-                {items.map((item, index) => (
-                    <div key={index} className='flex items-center mb-2'>
-                        <input
-                            type='text'
-                            placeholder='Item Name'
-                            className='mr-2 p-2 border rounded'
-                            value={item.name}
-                            onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                        />
-                        <input
-                            type='number'
-                            placeholder='Quantity'
-                            className='mr-2 p-2 border rounded'
-                            value={item.quantity}
-                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                        />
-                        <input
-                            type='number'
-                            placeholder='Unit Cost'
-                            className='mr-2 p-2 border rounded'
-                            value={item.unitCost}
-                            onChange={(e) => handleItemChange(index, 'unitCost', e.target.value)}
-                        />
-                        <button
-                            className='bg-red-500 text-white p-2 rounded'
-                            onClick={() => removeItem(index)}
-                        >
-                            Remove
-                        </button>
-                    </div>
-                ))}
+                {items.length !== 0
+                    &&
+                    <table>
+                        <thead>
+                            <tr>
+                                <th className='p-2'>Item Name</th>
+                                <th className='p-2'>Quantity</th>
+                                <th className='p-2'>Unit Cost</th>
+                                <th className='p-2'></th>
+                            </tr>
+                        </thead>
+                        <tbody className='items-center mb-2'>
+                            {items.map((item, index) => (
+                                <tr key={index}>
+                                    <td className='py-2'>
+                                        <input
+                                            type='text'
+                                            placeholder='Item Name'
+                                            className='mr-2 p-2 border rounded'
+                                            value={item.name}
+                                            onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                                        />
+                                    </td>
+                                    <td className='py-2'>
+                                        <input
+                                            type='number'
+                                            placeholder='Quantity'
+                                            className='mr-2 p-2 border rounded'
+                                            value={item.quantity}
+                                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                                        />
+                                    </td>
+                                    <td className='py-2'>
+                                        <input
+                                            type='number'
+                                            placeholder='Unit Cost'
+                                            className='mr-2 p-2 border rounded'
+                                            value={item.unitCost}
+                                            onChange={(e) => handleItemChange(index, 'unitCost', e.target.value)}
+                                        />
+                                    </td>
+                                    <td className='py-2'>
+                                        <button
+                                            className='bg-red-500 text-white p-2 rounded'
+                                            onClick={() => removeItem(index)}
+                                        >
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                }
                 <button
-                    className='bg-blue-500 text-white p-2 rounded'
+                    className='bg-blue-500 text-white mt-4 p-2 rounded'
                     onClick={addItem}
                 >
                     Add Item
@@ -119,7 +140,7 @@ const CreateOrder = () => {
                     <h3 className='text-xl font-semibold'>Total: ${order.totalPrice.toFixed(2)}</h3>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

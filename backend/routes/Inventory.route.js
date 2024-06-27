@@ -1,6 +1,6 @@
 import express from 'express';
 import fetchUser from '../middleware/fetchUser.js';
-import { getInventory, addInventory, editInventory, deleteInventory } from '../controllers/inventory.controller.js';
+import { getInventory, addInventory, editInventory, deleteInventory } from '../controllers/Inventory.controller.js';
 
 const router = express.Router();
 
