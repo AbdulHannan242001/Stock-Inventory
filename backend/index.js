@@ -3,6 +3,10 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
+import InventoryRoute from './routes/Inventory.route.js';
+import AuthRoute from './routes/Auth.route.js';
+import InvoiceRoute from './routes/Invoice.route.js';
+
 import connectToMongoDB from './db/db.js';
 
 
@@ -19,10 +23,11 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use('/api/inventory', )
-
+app.use('/api/auth', AuthRoute);
+app.use('/api/inventory', InventoryRoute);
+app.use('/api/invoice', InvoiceRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
     connectToMongoDB();
-})
+});
