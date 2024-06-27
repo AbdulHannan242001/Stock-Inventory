@@ -14,7 +14,7 @@ const ViewOrder = () => {
                     id: response.data.id,
                     date: new Date(new Date().setDate(new Date().getDate() - Math.floor(Math.random() * 30))).toLocaleDateString(),
                     deliveryDate: new Date(new Date().setDate(new Date().getDate() + Math.floor(Math.random() * 30))).toLocaleDateString(),
-                    status: ['Pending', 'Shipped', 'Delivered'][Math.floor(Math.random() * 3)],
+                    status: ['Pending', 'Delivered'][Math.floor(Math.random() * 2)],
                     deliveryStatus: ['On Time', 'Overdue', 'Incomplete'][Math.floor(Math.random() * 3)],
                     items: [
                         { name: 'Item 1', quantity: 2, unitCost: 25.00 },
@@ -22,10 +22,8 @@ const ViewOrder = () => {
                         { name: 'Item 3', quantity: 3, unitCost: 15.00 },
                     ],
                     totalPrice: 140.00,
-                    customer: {
+                    vendor: {
                         name: 'John Doe',
-                        shippingAddress: '123 Main St, Anytown, USA',
-                        billingAddress: '123 Main St, Anytown, USA',
                         contact: 'john.doe@example.com'
                     },
                     payment: {
@@ -33,13 +31,6 @@ const ViewOrder = () => {
                         status: 'Paid',
                         transactionId: '123456789'
                     },
-                    shipping: {
-                        method: 'Standard Shipping',
-                        trackingNumber: '1Z9999999999999999',
-                        carrier: 'UPS',
-                        estimatedDelivery: new Date(new Date().setDate(new Date().getDate() + Math.floor(Math.random() * 7))).toLocaleDateString()
-                    },
-                    notes: 'Leave package at the front door if no one is home.'
                 };
                 setOrder(orderData);
             })
@@ -61,28 +52,15 @@ const ViewOrder = () => {
                 <p>Delivery Status: <span className={`font-semibold ${order.deliveryStatus === 'Overdue' ? 'text-red-600' : order.deliveryStatus === 'Incomplete' ? 'text-orange-600' : ''}`}>{order.deliveryStatus}</span></p>
             </div>
             <div className='border-b pb-4 mb-4'>
-                <h2 className='text-xl font-semibold'>Customer Information</h2>
-                <p>Name: {order.customer.name}</p>
-                <p>Shipping Address: {order.customer.shippingAddress}</p>
-                <p>Billing Address: {order.customer.billingAddress}</p>
-                <p>Contact: {order.customer.contact}</p>
+                <h2 className='text-xl font-semibold'>Vendor Information</h2>
+                <p>Name: {order.vendor.name}</p>
+                <p>Contact: {order.vendor.contact}</p>
             </div>
             <div className='border-b pb-4 mb-4'>
                 <h2 className='text-xl font-semibold'>Payment Information</h2>
                 <p>Method: {order.payment.method}</p>
                 <p>Status: {order.payment.status}</p>
                 <p>Transaction ID: {order.payment.transactionId}</p>
-            </div>
-            <div className='border-b pb-4 mb-4'>
-                <h2 className='text-xl font-semibold'>Shipping Information</h2>
-                <p>Method: {order.shipping.method}</p>
-                <p>Tracking Number: {order.shipping.trackingNumber}</p>
-                <p>Carrier: {order.shipping.carrier}</p>
-                <p>Estimated Delivery: {order.shipping.estimatedDelivery}</p>
-            </div>
-            <div className='border-b pb-4 mb-4'>
-                <h2 className='text-xl font-semibold'>Order Notes</h2>
-                <p>{order.notes}</p>
             </div>
             <div className='border-b pb-4 mb-4'>
                 <h2 className='text-xl font-semibold'>Items</h2>

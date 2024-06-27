@@ -41,9 +41,9 @@ const Sidebar = () => {
               <i className='text-secondary-light'><TbTruckDelivery /></i> Orders
             </Link>
           </li>
-          <li className={location.pathname === "/report" ? " bg-secondary-dark text-white text-lg p-2 rounded-l-2xl transition duration-300" : "text-white text-lg p-2"}>
+          <li className={location.pathname === "/reports" ? " bg-secondary-dark text-white text-lg p-2 rounded-l-2xl transition duration-300" : "text-white text-lg p-2"}>
             <Link to="/reports" className='flex items-center gap-x-2'>
-              <i className='text-secondary-light'><AiOutlineReconciliation /></i> Financial Reporting
+              <i className='text-secondary-light'><AiOutlineReconciliation /></i> Reports
             </Link>
           </li>
         </ul>

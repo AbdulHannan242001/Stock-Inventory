@@ -21,7 +21,7 @@ const OrderList = () => {
                     id: item.id,
                     date: new Date(new Date().setDate(new Date().getDate() - Math.floor(Math.random() * 30))).toLocaleDateString(),
                     deliveryDate: new Date(new Date().setDate(new Date().getDate() + Math.floor(Math.random() * 30))).toLocaleDateString(),
-                    status: ['Pending', 'Shipped', 'Delivered'][Math.floor(Math.random() * 3)],
+                    status: ['Pending', 'Delivered'][Math.floor(Math.random() * 2)],
                     deliveryStatus: ['On Time', 'Overdue', 'Incomplete'][Math.floor(Math.random() * 3)],
                     items: Math.floor(Math.random() * 5) + 1,
                     totalPrice: parseFloat((Math.random() * 100).toFixed(2)),

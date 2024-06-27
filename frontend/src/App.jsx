@@ -16,7 +16,7 @@ import ViewOrder from "./pages/Order/ViewOrder";
 import EditInventory from "./pages/Inventory/EditInventory";
 import { InvoiceProvider } from './pages/Invoice/InvoiceContext';
 import EditOrder from "./pages/Order/EditOrder";
-import CreateOrder from "./pages/Order/EditOrder";
+import CreateOrder from "./pages/Order/CreateOrder";
 import AdvancedReporting from "./pages/Report/AdvancedReporting";
 import { Toaster } from "react-hot-toast";
 
