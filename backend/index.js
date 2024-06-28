@@ -7,6 +7,7 @@ import InventoryRoute from './routes/Inventory.route.js';
 import AuthRoute from './routes/Auth.route.js';
 import InvoiceRoute from './routes/Invoice.route.js';
 import OrderRoute from './routes/Order.route.js';
+import ExpenseRoute from './routes/Expense.route.js';
 
 import connectToMongoDB from './db/db.js';
 
@@ -27,7 +28,8 @@ app.use(cors({
 app.use('/api/auth', AuthRoute);
 app.use('/api/inventory', InventoryRoute);
 app.use('/api/invoice', InvoiceRoute);
-app.use('/api/order', OrderRoute)
+app.use('/api/order', OrderRoute);
+app.use('/api/expense', ExpenseRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
