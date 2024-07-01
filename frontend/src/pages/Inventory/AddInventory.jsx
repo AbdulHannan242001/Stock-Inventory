@@ -1,39 +1,54 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import CreateForm from '../../components/CreateForm';
+import InventoryContext from '../../context/InventoryContext/inventoryContext';
+import toast from 'react-hot-toast';
 
 const AddInventory = () => {
+    const context = useContext(InventoryContext);
+    const { addInventory } = context;
+    const [formValue, setFormValue] = useState({
+        name: '',
+        category: '',
+        lowStockThreshold: '',
+        quantity: '',
+        price: '',
+    });
     const navigate = useNavigate();
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormValue({ ...formValue, [name]: value });
+        console.log(formValue);
+    };
+
     const formFields = [
-        { name: 'name', label: 'Name', type: 'text', initialValue: '' },
-        { name: 'category', label: 'Category', type: 'text', initialValue: '' },
-        { name: 'quantity', label: 'Quantity', type: 'number', initialValue: '' },
-        { name: 'price', label: 'Price', type: 'number', step: '0.01', initialValue: '' },
+        { name: 'name', label: 'Name', type: 'text' },
+        { name: 'category', label: 'Category', type: 'text' },
+        { name: 'lowStockThreshold', label: 'lowStockThreshold', type: 'text' },
+        { name: 'quantity', label: 'Quantity', type: 'number' },
+        { name: 'price', label: 'Price', type: 'number', step: '0.01' },
     ];
 
-    const handleSubmit = (formData) => {
-        const newItem = {
-            name: formData.name,
-            category: formData.category,
-            quantity: parseInt(formData.quantity, 10),
-            price: parseFloat(formData.price),
-        };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formValue.name || !formValue.category || !formValue.lowStockThreshold || !formValue.quantity || !formValue.price) {
+            toast.error('Please fill all the fields');
+            return;
+        }
+        await addInventory(formValue);
 
-        axios.post('https://jsonplaceholder.typicode.com/posts', newItem)
-            .then(response => {
-                console.log('New item added:', response.data);
-                navigate('/inventory');
-            })
-            .catch(error => console.error('Error adding new item:', error));
+        navigate('/inv');
     };
 
     return (
+        // formTitle, formFields, onSubmit, formData, handleChange
         <CreateForm
             formTitle="New Inventory Item"
             formFields={formFields}
             onSubmit={handleSubmit}
+            formData={formValue}
+            handleChange={handleChange}
         />
     );
 };

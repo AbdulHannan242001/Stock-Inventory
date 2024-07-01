@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import InventoryContext from '../../context/InventoryContext/inventoryContext';
 
 const EditInventory = () => {
+    const context = useContext(InventoryContext);
+    const { inventoryData, editInventory } = context;
     const { id } = useParams();
+    const findData = inventoryData.find(inventory => (inventory._id).toString() === (id.toString()));
     const navigate = useNavigate();
     const [inventory, setInventory] = useState({
-        id: '',
         name: '',
-        quantity: '',
-        price: '',
+        quantity: 0,
+        price: 0,
         category: '',
+        lowStockThreshold: 0
     });
 
     useEffect(() => {
-        axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`)
-            .then(response => {
-                const inventoryData = {
-                    id: response.data.id,
-                    name: `item ${response.data.id}`,
-                    price: response.data.price,
-                    category: response.data.category,
-                    // Add more properties as needed
-                };
-                setInventory(inventoryData);
+        if (findData) {
+            setInventory({
+                name: findData.name,
+                quantity: findData.quantity,
+                price: findData.price,
+                category: findData.category,
+                lowStockThreshold: findData.lowStockThreshold
             })
-            .catch(error => console.error('Error fetching inventory:', error));
-    }, [id]);
+        }
+    }, [id, findData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,13 +38,8 @@ const EditInventory = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Here you would typically send the updated inventory data to the server
-        axios.put(`https://jsonplaceholder.typicode.com/posts/${id}`, inventory)
-            .then(response => {
-                console.log('inventory updated:', response.data);
-                navigate(`/inventorys`);
-            })
-            .catch(error => console.error('Error updating inventory:', error));
+        editInventory(id, inventory);
+        navigate('/inv');
     };
 
     return (
@@ -57,8 +52,7 @@ const EditInventory = () => {
                         type='text'
                         name='id'
                         id='id'
-                        value={inventory.id}
-                        onChange={handleChange}
+                        value={id}
                         className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
                         disabled
                     />
@@ -86,18 +80,15 @@ const EditInventory = () => {
                     />
                 </div>
                 <div className='mb-4'>
-                    <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='Category'>Status</label>
-                    <select
-                        name='Category'
+                    <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='Category'>Category</label>
+                    <input
+                        type='text'
+                        name='category'
                         id='Category'
                         value={inventory.category}
                         onChange={handleChange}
                         className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                    >
-                        <option value='Electronics'>Electronics</option>
-                        <option value='Clothing'>Clothing</option>
-                        <option value='Furniture'>Furniture</option>
-                    </select>
+                    />
                 </div>
                 <div className='mb-4'>
                     <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='quantity'>Quantity</label>
@@ -106,6 +97,17 @@ const EditInventory = () => {
                         name='quantity'
                         id='quantity'
                         value={inventory.quantity}
+                        onChange={handleChange}
+                        className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+                    />
+                </div>
+                <div className='mb-4'>
+                    <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='lowStockThreshold'>Low Stock</label>
+                    <input
+                        type='text'
+                        name='lowStockThreshold'
+                        id='lowStockThreshold'
+                        value={inventory.lowStockThreshold}
                         onChange={handleChange}
                         className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
                     />

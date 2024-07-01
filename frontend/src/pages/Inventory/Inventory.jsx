@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Pie } from 'react-chartjs-2';
@@ -6,10 +6,14 @@ import 'chart.js/auto';
 import { confirmAlert } from 'react-confirm-alert';
 import Modal from 'react-modal';
 import toast from 'react-hot-toast';
+import InventoryContext from '../../context/InventoryContext/inventoryContext';
 
 Modal.setAppElement('#root');
 
 const Inventory = () => {
+    const context = useContext(InventoryContext);
+    const { inventoryData, deleteInventory } = context;
+
     const [inventory, setInventory] = useState([]);
     const [displayedInventory, setDisplayedInventory] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,22 +25,10 @@ const Inventory = () => {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        axios.get('https://jsonplaceholder.typicode.com/posts')
-            .then(response => {
-                const inventoryData = response.data.map(item => ({
-                    id: item.id,
-                    name: `Item ${item.id}`,
-                    quantity: Math.floor(Math.random() * 200),
-                    price: parseFloat((Math.random() * 100).toFixed(2)),
-                    category: ['Electronics', 'Clothing', 'Furniture'][Math.floor(Math.random() * 3)],
-                    lowStockThreshold: 10,
-                }));
-                setInventory(inventoryData);
-                setDisplayedInventory(inventoryData);
-                checkLowStockLevels(inventoryData);
-            })
-            .catch(error => console.error('Error fetching inventory:', error));
-    }, []);
+        setInventory(inventoryData);
+        setDisplayedInventory(inventoryData);
+        checkLowStockLevels(inventoryData);
+    }, [inventoryData]);
 
     const checkLowStockLevels = (inventoryData) => {
         const lowStockItems = inventoryData.filter(item => item.quantity <= item.lowStockThreshold);
@@ -91,28 +83,48 @@ const Inventory = () => {
 
     const totalQuantity = inventory.reduce((total, item) => total + item.quantity, 0);
 
-    const pieData = {
-        labels: ['Electronics', 'Clothing', 'Furniture'],
-        datasets: [{
-            data: [
-                inventory.filter(item => item.category === 'Electronics').length,
-                inventory.filter(item => item.category === 'Clothing').length,
-                inventory.filter(item => item.category === 'Furniture').length,
-            ],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        }]
-    };
+    const pieDataFunction = () => {
+        // get unique categories with unique color each
 
-    const deleteItem = (itemId) => {
-        axios.delete(`/items/${itemId}`)
-            .then(response => {
-                const updatedInventory = inventory.filter(item => item.id !== itemId);
-                setInventory(updatedInventory);
-                setDisplayedInventory(updatedInventory);
-                checkLowStockLevels(updatedInventory);
-            })
-            .catch(error => console.error('Error deleting item:', error));
-    };
+        let data = [];
+        let pieData
+        let uniqueCategories = [...new Set(inventory.map(item => item.category))];
+
+        if (uniqueCategories.length === 0) {
+            pieData = {
+                labels: ['No Data'],
+                datasets: [{
+                    data: [0],
+                    backgroundColor: ['#FFCE56'],
+                }]
+            }
+        }
+        const colors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#FFCD56', '#C9CBCF', '#FF5733', '#33FF57',
+            '#3357FF', '#FF33A1', '#A1FF33', '#33FFF6', '#FF9133',
+            '#9133FF', '#33FF91', '#9133FF', '#33A1FF', '#F633FF'
+        ];
+
+        let color;
+
+        uniqueCategories && uniqueCategories.forEach(uniqueCategory => {
+            const count = inventory.filter(item => item.category === uniqueCategory).length;
+            color = uniqueCategories.indexOf(uniqueCategory)
+            data.push({
+                data: count,
+                backgroundColor: colors[color],
+            });
+        })
+        pieData = {
+            labels: uniqueCategories,
+            datasets: [{ data: data.map(item => item.data), backgroundColor: data.map(item => item.backgroundColor) }]
+        }
+        return pieData
+    }
+
+
+    const pieData = pieDataFunction();
 
     const handleDelete = (itemId) => {
         confirmAlert({
@@ -124,7 +136,7 @@ const Inventory = () => {
                         <button
                             className="bg-accent-red hover:bg-accent-red text-white font-bold py-2 px-4 rounded"
                             onClick={() => {
-                                deleteItem(itemId);
+                                deleteInventory(itemId);
                                 onClose();
                             }}
                         >
@@ -198,9 +210,9 @@ const Inventory = () => {
                 <table className='border w-8/12 bg-white shadow-lg rounded-lg'>
                     <thead className='bg-secondary-dark text-white'>
                         <tr>
-                            <th className='p-2 cursor-pointer' onClick={() => handleSort('id')}>
+                            {/* <th className='p-2 cursor-pointer' onClick={() => handleSort('id')}>
                                 Item ID <span>{sortConfig.key === 'id' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
-                            </th>
+                            </th> */}
                             <th className='p-2 cursor-pointer' onClick={() => handleSort('name')}>
                                 Name <span>{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
@@ -218,15 +230,15 @@ const Inventory = () => {
                     </thead>
                     <tbody>
                         {currentItems.map(item => (
-                            <tr key={item.id} className={`border-b border-secondary-light hover:bg-gray-100 ${item.quantity <= item.lowStockThreshold ? 'bg-yellow-100' : ''}`}>
-                                <td className='text-center p-2'>{item.id}</td>
+                            <tr key={item._id} className={`border-b border-secondary-light hover:bg-gray-100 ${item.quantity <= item.lowStockThreshold ? 'bg-yellow-100' : ''}`}>
+                                {/* <td className='text-center p-2'>{item.id}</td> */}
                                 <td className='text-center p-2'>{item.name}</td>
                                 <td className='text-center p-2'>{item.category}</td>
                                 <td className={`text-center p-2 ${item.quantity <= item.lowStockThreshold ? 'text-accent-red font-bold' : ''}`}>{item.quantity}</td>
                                 <td className='text-center p-2'>${item.price}</td>
                                 <td className='text-center p-2'>
-                                    <Link to={`/inv/edit/${item.id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>Edit</Link>
-                                    <button onClick={() => handleDelete(item.id)} className='text-accent-red hover:text-accent-darkred mx-2'>Delete</button>
+                                    <Link to={`/inv/edit/${item._id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>Edit</Link>
+                                    <button onClick={() => handleDelete(item._id)} className='text-accent-red hover:text-accent-darkred mx-2'>Delete</button>
                                     {item.quantity <= item.lowStockThreshold && (
                                         <button onClick={() => openModal()} className='text-accent-blue hover:text-accent-darkblue mx-2'>Reorder</button>
                                     )}
