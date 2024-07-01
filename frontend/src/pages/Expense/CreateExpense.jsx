@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import CreateForm from '../../components/CreateForm';
 import ExpenseContext from '../../context/ExpenseContext/expenseContext';
+import { useNavigate } from 'react-router-dom';
 
 const CreateExpense = () => {
     const context = useContext(ExpenseContext);
     const { createExpense } = context;
+    const navigate = useNavigate();
     const [Expense, setExpense] = useState({
         date: '',
         expenseName: '',
@@ -24,6 +26,7 @@ const CreateExpense = () => {
             amount: 0,
             category: '',
         });
+        navigate('/expenses')
     };
 
     const ExpenseFormFields = [
