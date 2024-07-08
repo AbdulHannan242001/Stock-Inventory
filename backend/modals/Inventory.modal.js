@@ -18,7 +18,7 @@ const InventorySchema = new mongoose.Schema({
         required: true
     },
     lowStockThreshold: {
-        type: String,
+        type: Number,
         required: true
     }
 });

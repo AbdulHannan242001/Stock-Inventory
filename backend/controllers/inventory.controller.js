@@ -5,6 +5,7 @@ export const getInventory = async (req, res) => {
         const inventory = await InventoryModal.find();
         res.status(200).json(inventory);
     } catch (error) {
+        console.error("Error getting inventory:", error);
         res.status(500).json({ message: error.message });
     }
 }
@@ -49,7 +50,7 @@ export const editInventory = async (req, res) => {
         res.status(200).json(updatedInventory);
 
     } catch (error) {
-        console.error("Error updating inventory:", error);
+        console.error("Error updating inventory item:", error);
         res.status(500).json({ message: error.message });
     }
 }
@@ -57,6 +58,8 @@ export const editInventory = async (req, res) => {
 export const deleteInventory = async (req, res) => {
     try {
         const { id } = req.params;
+        const find = await InventoryModal.findById(id);
+        if (!find) return res.status(404).json({ message: "Inventory not found" });
         await InventoryModal.findByIdAndDelete(id);
         res.status(200)
             .json({
@@ -64,6 +67,7 @@ export const deleteInventory = async (req, res) => {
             });
 
     } catch (error) {
+        console.error("Error deleting inventory item:", error);
         res.status(500).json({ message: error.message });
     }
 }

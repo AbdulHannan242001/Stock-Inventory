@@ -15,7 +15,7 @@ const addSaltAndPepper = async (password) => {
 
 export const register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { firstName, lastName, email, password } = req.body;
 
         const isValid = checkInfo(name, email);
 
@@ -27,9 +27,13 @@ export const register = async (req, res) => {
 
         const hashedPassword = await addSaltAndPepper(password);
 
+        const profilePic = `https://avatar.iran.liara.run/username?username=${firstName}+${lastName}`
+
         const newUser = new User({
-            name,
+            firstName,
+            lastName,
             email,
+            profilePic,
             password: hashedPassword
         });
 
@@ -41,6 +45,7 @@ export const register = async (req, res) => {
             _id: newUser._id,
             name: newUser.name,
             email: newUser.email,
+            profilePic: newUser.profilePic,
             createdAt: newUser.createdAt,
             updatedAt: newUser.updatedAt
         });
@@ -76,6 +81,7 @@ export const login = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            profilePic: user.profilePic,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
         });

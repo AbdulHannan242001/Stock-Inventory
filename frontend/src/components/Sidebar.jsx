@@ -16,7 +16,7 @@ const Sidebar = () => {
       </div>
       <div className='text-white py-5'>
         <ul className='flex flex-col space-y-2 pl-10'>
-          <li className={location.pathname === "/" ? " bg-secondary-dark text-white text-lg p-2 rounded-l-2xl transition duration-300" : "text-white text-lg p-2"}>
+          <li className={location.pathname === "/home" ? " bg-secondary-dark text-white text-lg p-2 rounded-l-2xl transition duration-300" : "text-white text-lg p-2"}>
             <Link to="/" className='flex items-center gap-x-2'>
               <i className='text-secondary-light'><AiFillHome /></i> Home
             </Link>

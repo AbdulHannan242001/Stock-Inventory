@@ -2,8 +2,8 @@ import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
 const DoughnutChart = ({ inventory }) => {
-    const categories = [...new Set(inventory.map(item => item.category))];
-    const categorySales = categories.map(category => {
+    const categories = inventory && [...new Set(inventory.map(item => item.category))];
+    const categorySales = categories && categories.map(category => {
         const categoryItems = inventory.filter(item => item.category === category);
         return categoryItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
     });
