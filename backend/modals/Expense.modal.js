@@ -16,6 +16,9 @@ const expenseSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true
+    },
+    orderNumber: {
+        type: String
     }
 });
 

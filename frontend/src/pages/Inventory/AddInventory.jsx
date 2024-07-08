@@ -19,7 +19,6 @@ const AddInventory = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormValue({ ...formValue, [name]: value });
-        console.log(formValue);
     };
 
     const formFields = [

@@ -1,48 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useState, useContext } from 'react';
 import CreateForm from '../../components/CreateForm';
+import OrderContext from '../../context/OrderContext/orderContext';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import ExpenseContext from '../../context/ExpenseContext/expenseContext';
+
+
+const checkData = (vendorName, contact, payMethod, payStatus, expectedDelivery) => {
+    if ((!vendorName || vendorName.length < 3) || (!contact || contact.length < 9) || !payMethod || !payStatus || !expectedDelivery) {
+        return false;
+    }
+
+    return true;
+};
+
+const checkItem = (name, quantity, unitCost) => {
+
+    if ((!name || name.length < 3) || (!quantity || quantity < 1) || (!unitCost || unitCost < 1)) {
+        return false;
+    }
+
+    return true;
+};
 
 const CreateOrder = () => {
+    const expContext = useContext(ExpenseContext);
+    const { createExpense } = expContext;
+    const context = useContext(OrderContext);
+    const { createOrder } = context;
+    const nav = useNavigate();
     const [order, setOrder] = useState({
-        orderId: '',
-        date: '',
-        deliveryDate: '',
-        status: 'Pending',
-        deliveryStatus: 'On Time',
         vendorName: '',
         contact: '',
-        paymentMethod: 'Credit Card',
-        paymentStatus: 'Paid',
-        transactionId: '',
-        shippingMethod: 'Standard Shipping',
-        trackingNumber: '',
-        carrier: 'UPS',
-        estimatedDelivery: '',
-        notes: '',
-        items: [],
-        totalPrice: 0,
+        payMethod: 'COD',
+        payStatus: 'Paid',
+        expectedDelivery: '',
     });
 
-    const [items, setItems] = useState([{ name: '', quantity: 1, unitCost: 0 }]);
-    const [errors, setErrors] = useState({});
-
-    useEffect(() => {
-        const orderId = uuidv4();
-        setOrder((prevOrder) => ({ ...prevOrder, orderId }));
-    }, []);
+    const [items, setItems] = useState([
+        {
+            name: '',
+            quantity: 0,
+            unitCost: 0,
+            category: '',
+        }
+    ]);
 
     const handleItemChange = (index, field, value) => {
         const newItems = [...items];
         newItems[index][field] = value;
         setItems(newItems);
-
-        const totalPrice = newItems.reduce((sum, item) => sum + item.quantity * item.unitCost, 0);
-        setOrder((prevOrder) => ({ ...prevOrder, items: newItems, totalPrice }));
     };
 
+    const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.unitCost, 0);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setOrder((prevOrder) => ({
+            ...prevOrder,
+            [name]: value,
+        }));
+    };
     const addItem = () => {
-        setItems([...items, { name: '', quantity: 1, unitCost: 0 }]);
+        setItems([...items, { name: '', quantity: 0, unitCost: 0, category: '' }]);
     };
 
     const removeItem = (index) => {
@@ -53,93 +73,79 @@ const CreateOrder = () => {
         setOrder((prevOrder) => ({ ...prevOrder, items: newItems, totalPrice }));
     };
 
-    const handleSubmit = (formData) => {
-        axios.post('/orders', formData)
-            .then((response) => {
-                // Handle success response
-            })
-            .catch((error) => {
-                // Handle error response
-            });
+
+    const createNewOrder = async () => {
+        const { vendorName, contact, payMethod, payStatus, expectedDelivery } = order;
+
+        items.forEach(item => {
+            if (!checkItem(item.name, item.quantity, item.unitCost, item.category)) {
+                return toast.error('Please fill all the required fields');
+            }
+        });
+
+        const isValid = checkData(vendorName, contact, payMethod, payStatus, expectedDelivery);
+
+        if (!isValid) return toast.error('Please fill all the required fields');
+
+        const orderNum = await createOrder(vendorName, contact, payMethod, payStatus, expectedDelivery, items);
+
+        items.forEach(async (item) => {
+            const formData = {
+                date: new Date(),
+                expenseName: item.name,
+                amount: item.quantity * item.unitCost,
+                category: item.category,
+                orderNumber: orderNum
+            }
+
+            await createExpense(formData);
+        })
+
+
+
+        // await 
+
+        setOrder({
+            vendorName: '',
+            contact: '',
+            payMethod: 'COD',
+            payStatus: 'Paid',
+            expectedDelivery: '',
+        });
+
+        setItems([{ name: '', quantity: 0, unitCost: 0, category: '' }]);
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await createNewOrder();
+        nav('/orders');
+    };
+
+
     const orderFormFields = [
-        { name: 'vendorName', label: 'Vendor Name', type: 'text', initialValue: order.vendorName },
-        { name: 'contact', label: 'Contact', type: 'email', initialValue: order.contact },
-        { name: 'paymentMethod', label: 'Payment Method', type: 'select', options: ['Credit Card', 'PayPal', 'Bank Transfer', 'Cash On Delivery'], initialValue: order.paymentMethod },
-        { name: 'paymentStatus', label: 'Payment Status', type: 'select', options: ['Paid', 'Pending'], initialValue: order.paymentStatus },
-        { name: 'estimatedDelivery', label: 'Expected Delivery', type: 'date', initialValue: order.estimatedDelivery },
+        { name: 'vendorName', label: 'Vendor Name', type: 'text' },
+        { name: 'contact', label: 'Contact', type: 'text' },
+        { name: 'expectedDelivery', label: 'Expected Delivery', type: 'date' },
+        { name: 'payMethod', label: 'Payment Method', type: 'select', options: ["COD", "Bank Transfer", "E Transfer"] },
+        { name: 'payStatus', label: 'Payment Status', type: 'select', options: ["Paid", "Unpaid"] },
     ];
 
     return (
         <div className='w-full'>
-            <CreateForm formTitle="New Order" formFields={orderFormFields} onSubmit={handleSubmit} />
-            <div className='mt-4'>
-                <h2 className='text-xl font-semibold'>Items</h2>
-                {items.length !== 0
-                    &&
-                    <table>
-                        <thead>
-                            <tr>
-                                <th className='p-2'>Item Name</th>
-                                <th className='p-2'>Quantity</th>
-                                <th className='p-2'>Unit Cost</th>
-                                <th className='p-2'></th>
-                            </tr>
-                        </thead>
-                        <tbody className='items-center mb-2'>
-                            {items.map((item, index) => (
-                                <tr key={index}>
-                                    <td className='py-2'>
-                                        <input
-                                            type='text'
-                                            placeholder='Item Name'
-                                            className='mr-2 p-2 border rounded'
-                                            value={item.name}
-                                            onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                                        />
-                                    </td>
-                                    <td className='py-2'>
-                                        <input
-                                            type='number'
-                                            placeholder='Quantity'
-                                            className='mr-2 p-2 border rounded'
-                                            value={item.quantity}
-                                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                        />
-                                    </td>
-                                    <td className='py-2'>
-                                        <input
-                                            type='number'
-                                            placeholder='Unit Cost'
-                                            className='mr-2 p-2 border rounded'
-                                            value={item.unitCost}
-                                            onChange={(e) => handleItemChange(index, 'unitCost', e.target.value)}
-                                        />
-                                    </td>
-                                    <td className='py-2'>
-                                        <button
-                                            className='bg-red-500 text-white p-2 rounded'
-                                            onClick={() => removeItem(index)}
-                                        >
-                                            Remove
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                }
-                <button
-                    className='bg-blue-500 text-white mt-4 p-2 rounded'
-                    onClick={addItem}
-                >
-                    Add Item
-                </button>
-                <div className='text-right mt-4'>
-                    <h3 className='text-xl font-semibold'>Total: ${order.totalPrice.toFixed(2)}</h3>
-                </div>
-            </div>
+            <CreateForm formTitle="New Order"
+                formData={order}
+                formFields={orderFormFields}
+                handleChange={handleChange}
+                onSubmit={handleSubmit}
+                items={items}
+                handleItemChange={handleItemChange}
+                removeItem={removeItem}
+                addItem={addItem}
+                totalPrice={totalPrice}
+                boolean={true}
+            />
+
         </div >
     );
 };

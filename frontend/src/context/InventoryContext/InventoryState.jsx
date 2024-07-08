@@ -2,6 +2,15 @@ import React, { useEffect, useState } from 'react'
 import InventoryContext from './inventoryContext'
 import toast from 'react-hot-toast';
 
+const toTitleCase = (str) => {
+    if (!str) return str;
+    return str.replace(
+        /\w\S*/g,
+        function (txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+}
 const InventoryState = (props) => {
 
     const { children, authUser } = props;
@@ -35,7 +44,37 @@ const InventoryState = (props) => {
 
     const addInventory = async (formData) => {
         try {
-            const { name, quantity, price, category, lowStockThreshold } = formData;
+            setLoading(true);
+
+            let bool = false
+
+            const { name, quantity, price, unitCost, category, lowStockThreshold } = formData;
+
+            let newPrice = parseInt(price);
+
+            if (unitCost && !price) {
+                newPrice = parseInt(unitCost);
+                bool = true
+            }
+
+            const findItem = inventoryData.find((item) => toTitleCase(item.name) === toTitleCase(name) && toTitleCase(item.category) === toTitleCase(category) && (parseInt(item.price) === parseInt(price) || parseInt(item.price) === parseInt(newPrice)));
+
+            if (findItem) {
+                let formData;
+                const totalQuantity = parseFloat(findItem.quantity) + parseFloat(quantity);
+
+                formData = {
+                    name: toTitleCase(findItem.name),
+                    quantity: totalQuantity,
+                    price: findItem.price,
+                    category: toTitleCase(findItem.category),
+                    lowStockThreshold: findItem.lowStockThreshold,
+                    bool
+                }
+
+                await editInventory(findItem._id, formData);
+                return;
+            }
 
             const res = await fetch(`${host}/api/inventory/addInventory`, {
                 method: 'POST',
@@ -43,7 +82,15 @@ const InventoryState = (props) => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ name, quantity, price, category, lowStockThreshold })
+                body: JSON.stringify(
+                    {
+                        name: toTitleCase(name),
+                        quantity,
+                        price: newPrice,
+                        category: toTitleCase(category),
+                        lowStockThreshold: lowStockThreshold ? lowStockThreshold : 5
+                    }
+                )
             });
 
             const data = await res.json();
@@ -54,6 +101,9 @@ const InventoryState = (props) => {
             } else {
                 toast.error(data.message);
             }
+
+            if (bool) getInventory();
+
         } catch (error) {
             console.error(error);
             toast.error(error.message);
@@ -72,7 +122,35 @@ const InventoryState = (props) => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ name, quantity, price, category, lowStockThreshold })
+                body: JSON.stringify({ name: toTitleCase(name), quantity, price, category: toTitleCase(category), lowStockThreshold })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setinventoryData(inventoryData.map((inventory) => inventory._id === id ? data : inventory));
+                toast.success('Inventory updated successfully');
+            } else {
+                toast.error(data.message);
+            }
+
+        } catch (error) {
+            console.error(error);
+            toast.error(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const updateInventory = async (id, quantity) => {
+        try {
+            const res = await fetch(`${host}/api/inventory/updateInventory/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ quantity })
             });
 
             const data = await res.json();
@@ -90,6 +168,7 @@ const InventoryState = (props) => {
             setLoading(false);
         }
     }
+
 
     const deleteInventory = async (id) => {
         try {
@@ -126,6 +205,7 @@ const InventoryState = (props) => {
             inventoryData,
             addInventory,
             editInventory,
+            updateInventory,
             deleteInventory
         }}
         >
@@ -134,4 +214,4 @@ const InventoryState = (props) => {
     )
 }
 
-export default InventoryState
+export default InventoryState;

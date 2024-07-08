@@ -13,13 +13,23 @@ export const getInvoice = async (req, res) => {
 
 export const createInvoice = async (req, res) => {
     try {
-        const { customer, amount, paid, status } = req.body;
+        const { customer, amount, paid, status, items } = req.body;
 
-        if (!customer || !amount || !paid || !status) {
+        if (!customer || !status) {
 
             return res.status(400).json({ message: "Missing required fields" });
 
         }
+
+        if (typeof items !== "object" || items.length === 0) return res.status(400).json({ message: "Missing data" });
+
+        items.forEach(item => {
+            const { name, quantity, unitCost } = item;
+
+            if (!name || !quantity || !unitCost) {
+                return res.status(400).json({ message: "Missing data" })
+            }
+        })
 
         let existingInvoice;
 
@@ -48,13 +58,21 @@ export const createInvoice = async (req, res) => {
 
         }
 
+
+        let newPaid = paid;
+        let newAmount = amount;
+
+        if (!paid || paid === 0) newPaid = 0
+
+        if (!amount || amount === 0) newAmount = 0
+
         const newInvoice = new INVOICE({
             invoiceNumber: newInvoiceNum,
             customer,
-            amount,
-            paid,
+            amount: newAmount,
+            paid: newPaid,
             status,
-            items: []
+            items
         });
 
         await newInvoice.save();
@@ -77,42 +95,50 @@ export const createInvoice = async (req, res) => {
     }
 }
 
-export const addItem = async (req, res) => {
+export const editInvoice = async (req, res) => {
     try {
-
         const { id } = req.params;
 
-        const { name, quantity, unitCost } = req.body;
+        const { customer, amount, paid, status, items } = req.body;
 
-        const existingInvoice = await INVOICE.findById(id);
+        if (!customer || !status) {
 
-        if (!existingInvoice) {
-
-            return res.status(404).json({ message: "Invoice not found" });
+            return res.status(400).json({ message: "Missing required fields" });
 
         }
 
-        existingInvoice.items.push({ name, quantity, unitCost });
+        if (typeof items !== "object" || items.length === 0) return res.status(400).json({ message: "Missing data" });
 
-        await existingInvoice.save();
+        items.forEach(item => {
+            const { name, quantity, unitCost } = item;
 
-        res.status(200).json({
-            invoiceNumber: existingInvoice.invoiceNumber,
-            customer: existingInvoice.customer,
-            amount: existingInvoice.amount,
-            paid: existingInvoice.paid,
-            status: existingInvoice.status,
-            items: existingInvoice.items,
-            createdAt: existingInvoice.createdAt,
-            updatedAt: existingInvoice.updatedAt
-        });
+            if (!name || !quantity || !unitCost) {
+                return res.status(400).json({ message: "Missing data" })
+            }
+        })
+
+        let newPaid = paid;
+        let newAmount = amount;
+
+        if (!paid || paid === 0) newPaid = 0
+
+        if (!amount || amount === 0) newAmount = 0
+
+        const newInvoice = {
+            customer,
+            amount: newAmount,
+            paid: newPaid,
+            status,
+            items
+        };
+
+        const updatedInvoice = await INVOICE.findByIdAndUpdate(id, newInvoice, { new: true });
+
+        res.status(200).json(updatedInvoice);
 
     } catch (error) {
-
-        console.error("Error adding item:", error);
-
-        res.status(500).json({ message: "Internal Server Error" });
-
+        console.error("Error editing invoice:", error);
+        res.status(404).json({ message: error.message });
     }
 }
 

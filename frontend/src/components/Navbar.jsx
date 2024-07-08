@@ -9,7 +9,7 @@ const Navbar = () => {
     const { logout } = context;
     const getUserProfile = JSON.parse(localStorage.getItem('logged-in-user'));
 
-    const Navigate = useNavigate();
+    const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
     const handleClick = () => {
@@ -18,12 +18,12 @@ const Navbar = () => {
     const handleLogout = () => {
         logout();
         setOpen(false);
-        Navigate('/');
+        navigate('/');
     }
     return (
         <>
             <div className='px-5 bg-white py-2 flex w-12/12 border items-center'>
-                <h className='text-primary font-bold w-4/12 px-10'>Dashboard Preview</h>
+                <h1 className='text-primary font-bold w-4/12 px-10'>Dashboard Preview</h1>
                 <div className='text-primary font-bold w-8/12 flex justify-end'>
                     <div className='w-[5vh] h-[5vh] mx-3 rounded-full cursor-pointer' onClick={handleClick}>
                         <img src={getUserProfile && getUserProfile.profilePic} alt="PP" />

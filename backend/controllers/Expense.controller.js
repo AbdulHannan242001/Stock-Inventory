@@ -12,7 +12,7 @@ export const getExpenses = async (req, res) => {
 
 export const createExpense = async (req, res) => {
     try {
-        const { date, expenseName, amount, category } = req.body;
+        const { date, expenseName, amount, category, orderNumber } = req.body;
 
         const isValid = await checkData(date, expenseName, amount, category);
 
@@ -22,7 +22,8 @@ export const createExpense = async (req, res) => {
             date,
             expenseName,
             amount,
-            category
+            category,
+            orderNumber
         });
 
         await newExpense.save();
@@ -32,7 +33,8 @@ export const createExpense = async (req, res) => {
             date: newExpense.date,
             expenseName: newExpense.expenseName,
             amount: newExpense.amount,
-            category: newExpense.category
+            category: newExpense.category,
+            orderNumber: newExpense.orderNumber
         });
 
     } catch (error) {
@@ -49,7 +51,7 @@ export const editExpense = async (req, res) => {
 
         if (!findExpense) return res.status(404).json({ message: "Expense not found" });
 
-        const { date, expenseName, amount, category } = req.body;
+        const { date, expenseName, amount, category, orderNumber } = req.body;
 
         const isValid = await checkData(date, expenseName, amount, category);
 
@@ -59,7 +61,8 @@ export const editExpense = async (req, res) => {
             date,
             expenseName,
             amount,
-            category
+            category,
+            orderNumber
         }, { new: true });
 
         res.status(200).json({
@@ -67,7 +70,8 @@ export const editExpense = async (req, res) => {
             date: updatedExpense.date,
             expenseName: updatedExpense.expenseName,
             amount: updatedExpense.amount,
-            category: updatedExpense.category
+            category: updatedExpense.category,
+            orderNumber: updatedExpense.orderNumber
         });
 
     } catch (error) {

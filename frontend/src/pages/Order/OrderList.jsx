@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import OrderContext from '../../context/OrderContext/orderContext';
 
 const OrderList = () => {
+    const context = useContext(OrderContext);
+    const { orderList, changeDeliveryStatus } = context;
     const [orders, setOrders] = useState([]);
     const [displayedOrders, setDisplayedOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,30 +17,27 @@ const OrderList = () => {
     const today = new Date().toLocaleDateString();
 
     useEffect(() => {
-        axios.get('https://jsonplaceholder.typicode.com/posts')
-            .then(response => {
-                const ordersData = response.data.map(item => ({
-                    id: item.id,
-                    date: new Date(new Date().setDate(new Date().getDate() - Math.floor(Math.random() * 30))).toLocaleDateString(),
-                    deliveryDate: new Date(new Date().setDate(new Date().getDate() + Math.floor(Math.random() * 30))).toLocaleDateString(),
-                    status: ['Pending', 'Delivered'][Math.floor(Math.random() * 2)],
-                    deliveryStatus: ['On Time', 'Overdue', 'Incomplete'][Math.floor(Math.random() * 3)],
-                    items: Math.floor(Math.random() * 5) + 1,
-                    totalPrice: parseFloat((Math.random() * 100).toFixed(2)),
-                }));
-                setOrders(ordersData);
-                setDisplayedOrders(ordersData.slice(0, itemsPerPage));
-            })
-            .catch(error => console.error('Error fetching orders:', error));
-    }, []);
+        setOrders(orderList);
+        setDisplayedOrders(orderList.slice(0, itemsPerPage));
+    }, [orderList]);
+
+    useEffect(() => {
+        const today = new Date();
+        orderList.forEach((order) => {
+            const date = new Date(order.expectedDelivery);
+            if (date < today && order.deliveryStatus !== 'Overdue') {
+                changeDeliveryStatus(order._id, 'Overdue');
+            }
+        })
+    }, [orderList])
 
     useEffect(() => {
         let filteredOrders = orders.filter(order =>
-            order.id.toString().includes(searchTerm) ||
-            order.date.includes(searchTerm) ||
-            order.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.deliveryDate.includes(searchTerm) ||
-            order.deliveryStatus.toLowerCase().includes(searchTerm.toLowerCase())
+            (order.orderId && order.orderId.toString().includes(searchTerm)) ||
+            (order.date && order.date.includes(searchTerm)) ||
+            (order.status && order.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (order.deliveryDate && order.deliveryDate.includes(searchTerm)) ||
+            (order.deliveryStatus && order.deliveryStatus.toLowerCase().includes(searchTerm.toLowerCase()))
         );
 
         if (filterStatus) {
@@ -95,15 +94,42 @@ const OrderList = () => {
 
     const toggleOverdueOrders = () => {
         setShowOverdue(prevState => !prevState);
-        setShowIncomplete(false); // Ensure the other filter is reset
+        setShowIncomplete(false);
         setCurrentPage(1);
     };
 
     const toggleIncompleteOrders = () => {
         setShowIncomplete(prevState => !prevState);
-        setShowOverdue(false); // Ensure the other filter is reset
+        setShowOverdue(false);
         setCurrentPage(1);
     };
+
+    const formatDate = (date) => {
+        const newDate = (date).toString().substring(0, 10);
+        const splitDate = newDate.split('-');
+        const [yyyy, mm, dd] = splitDate;
+        return `${mm}/${dd}/${yyyy}`
+    }
+
+    const checkDate = (date) => {
+        const newDate = new Date(date)
+        const localDate = newDate.toLocaleDateString()
+        return localDate
+    }
+
+    const checkDateForStatus = (date, status) => {
+        const newDate = new Date(date);
+
+        const currentDate = new Date();
+
+        if (status !== ' ') return status;
+
+        if ((currentDate > newDate)) {
+            return 'Overdue'
+        } else {
+            return "Not Delivered"
+        }
+    }
 
     return (
         <div className='w-full p-4 bg-white rounded-lg shadow-lg'>
@@ -122,53 +148,61 @@ const OrderList = () => {
                     className='text-sm text-secondary-dark bg-white p-2 rounded-lg'>
                     <option value=''>All Statuses</option>
                     <option value='Pending'>Pending</option>
-                    <option value='Shipped'>Shipped</option>
                     <option value='Delivered'>Delivered</option>
+                    <option value='Cancelled'>Cancelled</option>
                 </select>
                 <Link to='/orders/new' className='text-sm text-white bg-secondary p-2 rounded-lg'>Add new order</Link>
             </div>
             <div className='flex justify-between py-1 px-8 w-full mt-4 '>
-                <p className='text-sm text-secondary-dark'>Orders delivering today ({new Date().toLocaleDateString()}): {orders.filter(order => order.deliveryDate === new Date().toLocaleDateString()).length} are Highlighted</p>
+                <p className='text-sm text-secondary-dark'>Orders delivering today ({new Date().toLocaleDateString()}): {orders.filter(order => checkDate(order.expectedDelivery) === new Date().toLocaleDateString()).length} are Highlighted</p>
             </div>
             <div className='flex justify-between'>
                 <table className='border w-8/12 bg-white shadow-lg rounded-lg'>
                     <thead className='bg-secondary-dark text-white'>
                         <tr>
-                            <th className='p-2 cursor-pointer' onClick={() => handleSort('id')}>
+                            <th className='p-2 cursor-pointer' onClick={() => handleSort('id')} onMouseLeave={() => handleSort('')}>
                                 Order ID <span>{sortConfig.key === 'id' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
-                            <th className='p-2 cursor-pointer' onClick={() => handleSort('date')}>
-                                Date <span>{sortConfig.key === 'date' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
+                            <th className='p-2 cursor-pointer' onClick={() => handleSort('date')} onMouseLeave={() => handleSort('')}>
+                                Placed Date <span>{sortConfig.key === 'date' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
-                            <th className='p-2 cursor-pointer' onClick={() => handleSort('deliveryDate')}>
-                                Delivery Date <span>{sortConfig.key === 'deliveryDate' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
+                            <th className='p-2 cursor-pointer' onClick={() => handleSort('expectedDelivery')} onMouseLeave={() => handleSort('')}>
+                                Delivery on <span>{sortConfig.key === 'expectedDelivery' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
-                            <th className='p-2 cursor-pointer' onClick={() => handleSort('status')}>
+                            <th className='p-2 cursor-pointer' onClick={() => handleSort('status')} onMouseLeave={() => handleSort('')}>
                                 Status <span>{sortConfig.key === 'status' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
-                            <th className='p-2'>Items</th>
-                            <th className='p-2'>Total Price</th>
-                            <th className='p-2 cursor-pointer' onClick={() => handleSort('deliveryStatus')}>
+                            <th className='p-2 cursor-pointer' onClick={() => handleSort('deliveryStatus')} onMouseLeave={() => handleSort('')}>
                                 Delivery Status <span>{sortConfig.key === 'deliveryStatus' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
-                            <th className='p-2'>Actions</th>
+                            <th className='p-2 cursor-pointer' onClick={() => handleSort('payStatus')} onMouseLeave={() => handleSort('')}>
+                                Payment Status <span>{sortConfig.key === 'payStatus' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
+                            </th>
+                            <th className='p-2'>
+                                Total Price
+                            </th>
+                            <th className='p-2'>
+                                Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {displayedOrders.map(order => (
-                            <tr key={order.id} className={`border-b border-secondary-light hover:bg-gray-100 ${order.deliveryDate === today ? 'bg-yellow-100' : ''}`}>
-                                <td className='text-center p-2'>{order.id}</td>
-                                <td className='text-center p-2'>{order.date}</td>
-                                <td className='text-center p-2'>{order.deliveryDate}</td>
+                            <tr key={order._id} className={`border-b border-secondary-light hover:bg-gray-100 ${order.deliveryDate === today ? 'bg-yellow-100' : ''}`}>
+                                <td className='text-center p-2'>{order.orderId}</td>
+                                <td className='text-center p-2'>{formatDate(order.createdAt)}</td>
+                                <td className='text-center p-2'>{formatDate(order.expectedDelivery)}</td>
                                 <td className='text-center p-2'>{order.status}</td>
-                                <td className='text-center p-2'>{order.items}</td>
-                                <td className='text-center p-2'>${order.totalPrice.toFixed(2)}</td>
                                 <td className={`text-center p-2 ${order.deliveryStatus === 'Overdue' ? 'text-red-600' : order.deliveryStatus === 'Incomplete' ? 'text-orange-600' : ''}`}>
-                                    {order.deliveryStatus}
+                                    {checkDateForStatus(order.deliveryDate, order.deliveryStatus)}
+                                </td>
+                                <td className='text-center p-2'>{order.payStatus}</td>
+                                <td className={`text-center p-2`}>
+                                    ${order && order.items.reduce((total, item) => total + item.unitCost * item.quantity, 0).toFixed(2)}
                                 </td>
                                 <td className='text-center p-2'>
-                                    <Link to={`/orders/${order.id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>View</Link>
-                                    <Link to={`/orders/edit/${order.id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>Edit</Link>
+                                    <Link to={`/orders/${order._id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>View</Link>
+                                    <Link to={`/orders/edit/${order._id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>Edit</Link>
                                 </td>
                             </tr>
                         ))}

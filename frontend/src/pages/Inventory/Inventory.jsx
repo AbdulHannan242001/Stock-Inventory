@@ -12,7 +12,7 @@ Modal.setAppElement('#root');
 
 const Inventory = () => {
     const context = useContext(InventoryContext);
-    const { inventoryData, deleteInventory } = context;
+    const { inventoryData, updateInventory, deleteInventory } = context;
 
     const [inventory, setInventory] = useState([]);
     const [displayedInventory, setDisplayedInventory] = useState([]);
@@ -22,6 +22,7 @@ const Inventory = () => {
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [lowStockItems, setLowStockItems] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [quantity, setQuantity] = useState(0);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -84,7 +85,6 @@ const Inventory = () => {
     const totalQuantity = inventory.reduce((total, item) => total + item.quantity, 0);
 
     const pieDataFunction = () => {
-        // get unique categories with unique color each
 
         let data = [];
         let pieData
@@ -130,11 +130,11 @@ const Inventory = () => {
         confirmAlert({
             customUI: ({ onClose }) => (
                 <div className="fixed top-0 right-0 bottom-0 left-0 flex justify-center items-center bg-gray-500 bg-opacity-75">
-                    <div className="bg-accent-yellow text-white rounded-lg shadow-md p-4 w-64">
+                    <div className="bg-secondary text-white rounded-lg shadow-md p-4 w-64">
                         <h5 className="text-lg font-bold mb-2">Confirm Delete</h5>
                         <p className="text-sm mb-4">Are you sure you want to delete this Item?</p>
                         <button
-                            className="bg-accent-red hover:bg-accent-red text-white font-bold py-2 px-4 rounded"
+                            className="bg-red-700 hover:bg-accent-red text-white font-bold py-2 px-4 rounded"
                             onClick={() => {
                                 deleteInventory(itemId);
                                 onClose();
@@ -162,21 +162,11 @@ const Inventory = () => {
         setSortConfig({ key, direction });
     };
 
-    const reorderItem = (itemId, quantity) => {
-        const itemToReorder = inventory.find(item => item.id === itemId);
-        const newItem = {
-            ...itemToReorder,
-            quantity: itemToReorder.quantity + quantity,
-        };
-        axios.post('https://jsonplaceholder.typicode.com/posts', newItem)
-            .then(response => {
-                console.log('Item reordered:', response.data);
-                const updatedInventory = inventory.map(item => item.id === itemId ? newItem : item);
-                setInventory(updatedInventory);
-                setDisplayedInventory(updatedInventory);
-                checkLowStockLevels(updatedInventory);
-            })
-            .catch(error => console.error('Error reordering item:', error));
+    const reorderItem = async (itemId) => {
+        const find = inventory.find(item => parseInt(item._id) === parseInt(itemId));
+        const newQuantity = parseInt(find.quantity) + parseInt(quantity);
+        await updateInventory(itemId, newQuantity);
+        setQuantity(0);
     };
 
     const openModal = () => {
@@ -210,9 +200,6 @@ const Inventory = () => {
                 <table className='border w-8/12 bg-white shadow-lg rounded-lg'>
                     <thead className='bg-secondary-dark text-white'>
                         <tr>
-                            {/* <th className='p-2 cursor-pointer' onClick={() => handleSort('id')}>
-                                Item ID <span>{sortConfig.key === 'id' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
-                            </th> */}
                             <th className='p-2 cursor-pointer' onClick={() => handleSort('name')}>
                                 Name <span>{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? '▲' : '▼')}</span>
                             </th>
@@ -231,7 +218,6 @@ const Inventory = () => {
                     <tbody>
                         {currentItems.map(item => (
                             <tr key={item._id} className={`border-b border-secondary-light hover:bg-gray-100 ${item.quantity <= item.lowStockThreshold ? 'bg-yellow-100' : ''}`}>
-                                {/* <td className='text-center p-2'>{item.id}</td> */}
                                 <td className='text-center p-2'>{item.name}</td>
                                 <td className='text-center p-2'>{item.category}</td>
                                 <td className={`text-center p-2 ${item.quantity <= item.lowStockThreshold ? 'text-accent-red font-bold' : ''}`}>{item.quantity}</td>
@@ -308,13 +294,12 @@ const Inventory = () => {
                                 min="1"
                                 className="w-full p-2 border rounded"
                                 placeholder="Enter reorder quantity"
-                                onChange={(e) => item.reorderQuantity = parseInt(e.target.value)}
+                                onChange={(e) => setQuantity(e.target.value)}
                             />
                             <button
                                 className="bg-secondary text-white p-2 rounded mt-2 w-full"
                                 onClick={() => {
-                                    reorderItem(item.id, item.reorderQuantity);
-                                    handleAcknowledge(item.id);
+                                    reorderItem(item._id);
                                 }}
                             >
                                 Reorder

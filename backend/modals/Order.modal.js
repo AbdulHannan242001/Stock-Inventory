@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     },
     deliveryStatus: {
         type: String,
-        enum: ['On Time', 'Over Due', 'Incomplete'],
+        enum: ['On Time', 'Overdue', 'Incomplete', 'Not Delivered', 'Cancelled'],
     },
     vendorName: {
         type: String,
@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema({
     },
     payMethod: {
         type: String,
-        enum: ["COD", "Bank Transfer", "E Transfer"],
+        enum: ["COD", "Bank Transfer", "E Transfer", 'Cancelled'],
     },
     payStatus: {
         type: String,
@@ -37,7 +37,7 @@ const orderSchema = new mongoose.Schema({
     transactionId: {
         type: String,
     },
-    estimatedDDate: {
+    expectedDelivery: {
         type: Date,
     },
     items: [{
@@ -51,6 +51,10 @@ const orderSchema = new mongoose.Schema({
         },
         unitCost: {
             type: Number,
+            required: true
+        },
+        category: {
+            type: String,
             required: true
         }
     }]

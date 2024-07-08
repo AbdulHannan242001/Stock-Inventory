@@ -478,6 +478,13 @@ const Expenses = () => {
         datasets: dataset
     };
 
+    const formatDate = (date) => {
+        const newDate = (date).toString().substring(0, 10);
+        const splitDate = newDate.split('-');
+        const [yyyy, mm, dd] = splitDate;
+        return `${dd}-${mm}-${yyyy}`
+    }
+
     return (
         <div className="w-full p-4 bg-white rounded-lg shadow-lg">
             <div className="mb-4">
@@ -519,7 +526,7 @@ const Expenses = () => {
                     </div>
                     <div className="border-2 rounded-lg shadow-lg p-4 bg-gray-100">
                         <h2 className="text-center font-semibold text-primary-dark">Total Expense</h2>
-                        <p className="text-center text-2xl font-semibold py-2 text-secondary-dark">${totalExpense.toFixed(2) }
+                        <p className="text-center text-2xl font-semibold py-2 text-secondary-dark">${totalExpense.toFixed(2)}
                         </p>
                     </div>
                     <div className="border-2 rounded-lg shadow-lg p-4 bg-gray-100">
@@ -570,7 +577,7 @@ const Expenses = () => {
                 <tbody>
                     {currentItems.map((expense) => (
                         <tr key={expense._id} className="border-b border-secondary-light hover:bg-gray-100">
-                            <td className="text-center p-2">{(expense.date).toString().substring(0, 10)}</td>
+                            <td className="text-center p-2">{formatDate(expense.date)}</td>
                             <td className="text-center p-2">{expense.expenseName}</td>
                             <td className="text-center p-2">{expense.category}</td>
                             <td className="text-center p-2">${expense.amount.toFixed(2)}</td>

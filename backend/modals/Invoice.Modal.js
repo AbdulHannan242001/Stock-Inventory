@@ -16,16 +16,15 @@ const InvoiceSchema = new mongoose.Schema({
     },
     paid: {
         type: Number,
-        required: true
     },
     status: {
         type: String,
-        enum: ['pending', 'paid', 'overdue'],
+        enum: ['Unpaid', 'Paid', 'Due'],
         required: true
     },
     items: [
         {
-            productName: {
+            name: {
                 type: String,
             },
             quantity: {

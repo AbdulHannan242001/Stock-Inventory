@@ -1,212 +1,76 @@
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import axios from 'axios';
-
-// const EditOrder = () => {
-//     const { id } = useParams();
-//     const navigate = useNavigate();
-//     const [order, setOrder] = useState({
-//         id: '',
-//         expectedDeliveryDate: '',
-//         status: '',
-//         vendorName: '',
-//         contact: '',
-//         paymentMethod: '',
-//         paymentStatus: '',
-//         items: [],
-//     });
-
-//     useEffect(() => {
-//         axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`)
-//             .then(response => {
-//                 const orderData = response.data;
-//                 setOrder({
-//                     id: orderData.id,
-//                     date: orderData.date,
-//                     deliveryDate: orderData.deliveryDate,
-//                     status: orderData.status,
-//                     items: orderData.items,
-//                     totalPrice: orderData.totalPrice
-//                 });
-//             })
-//             .catch(error => console.error('Error fetching order:', error));
-//     }, [id]);
-
-//     const handleChange = (event) => {
-//         const { name, value } = event.target;
-//         setOrder(prevOrder => ({
-//             ...prevOrder,
-//             [name]: value
-//         }));
-//     };
-
-//     const [items, setItems] = useState([{ name: '', quantity: 1, unitCost: 0 }]);
-//     const addItem = () => {
-//         setItems([...items, { name: '', quantity: 1, unitCost: 0 }]);
-//     };
-
-//     const handleSubmit = (event) => {
-//         event.preventDefault();
-//         // Update the order using an API call
-//         axios.put(`https://jsonplaceholder.typicode.com/posts/${id}`, order)
-//             .then(response => {
-//                 console.log('Order updated successfully:', response.data);
-//                 // Redirect to the order list page or the updated order detail page
-//                 navigate.push('/orders');
-//             })
-//             .catch(error => console.error('Error updating order:', error));
-//     };
-
-//     return (
-//         <div className="p-4 bg-white rounded-lg shadow-md w-2/3 mx-auto">
-//             <h2 className="text-2xl font-semibold mb-4">Edit Order</h2>
-//             <form onSubmit={handleSubmit}>
-//                 <div className="mb-4">
-//                     <label htmlFor="VendorName" className="block text-sm font-medium text-gray-700">Vendor Name:</label>
-//                     <input type="text" id="VendorName" name="VendorName" value={order.vendorName} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
-//                 </div>
-//                 <div className="mb-4">
-//                     <label htmlFor="VendorContact" className="block text-sm font-medium text-gray-700">Vendor Contact:</label>
-//                     <input type="text" id="VendorContact" name="VendorContact" value={order.VendorContact} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
-//                 </div>
-//                 <div className="mb-4">
-//                     <label htmlFor="PayMethod" className="block text-sm font-medium text-gray-700">Pay Method:</label>
-//                     <input type="text" id="PayMethod" name="PayMethod" value={order.PayMethod} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
-//                 </div>
-//                 <div className="mb-4">
-//                     <label htmlFor="PayStatus" className="block text-sm font-medium text-gray-700">Pay Status:</label>
-//                     <input type="text" id="PayStatus" name="PayStatus" value={order.PayStatus} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
-//                 </div>
-//                 <div className="mb-4">
-//                     <label htmlFor="ExpectedDeliveryDate" className="block text-sm font-medium text-gray-700">Expected Delivery Date:</label>
-//                     <input type="text" id="ExpectedDeliveryDate" name="ExpectedDeliveryDate" value={order.expectedDeliveryDate} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
-//                 </div>
-//                 <div className="mb-4">
-//                     <h2 className='text-xl font-semibold'>Items</h2>
-//                     {order.items && order.items.length !== 0
-//                         &&
-//                         <table>
-//                             <thead>
-//                                 <tr>
-//                                     <th className='p-2'>Item Name</th>
-//                                     <th className='p-2'>Quantity</th>
-//                                     <th className='p-2'>Unit Cost</th>
-//                                     <th className='p-2'></th>
-//                                 </tr>
-//                             </thead>
-//                             <tbody className='items-center mb-2'>
-//                                 {order.items.map((item, index) => (
-//                                     <tr key={index}>
-//                                         <td className='py-2'>
-//                                             <input
-//                                                 type='text'
-//                                                 placeholder='Item Name'
-//                                                 className='mr-2 p-2 border rounded'
-//                                                 value={item.name}
-//                                                 onChange={(e) => handleChange(index, 'name', e.target.value)}
-//                                             />
-//                                         </td>
-//                                         <td className='py-2'>
-//                                             <input
-//                                                 type='number'
-//                                                 placeholder='Quantity'
-//                                                 className='mr-2 p-2 border rounded'
-//                                                 value={item.quantity}
-//                                                 onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-//                                             />
-//                                         </td>
-//                                         <td className='py-2'>
-//                                             <input
-//                                                 type='number'
-//                                                 placeholder='Unit Cost'
-//                                                 className='mr-2 p-2 border rounded'
-//                                                 value={item.unitCost}
-//                                                 onChange={(e) => handleChange(index, 'unitCost', e.target.value)}
-//                                             />
-//                                         </td>
-//                                         <td className='py-2'>
-//                                             <button
-//                                                 className='bg-red-500 text-white p-2 rounded'
-//                                                 onClick={() => removeItem(index)}
-//                                             >
-//                                                 Remove
-//                                             </button>
-//                                         </td>
-//                                     </tr>
-//                                 ))}
-//                             </tbody>
-//                         </table>
-//                     }
-//                     <button
-//                         className='bg-blue-500 text-white mt-4 p-2 rounded'
-//                         onClick={addItem}
-//                     >
-//                         Add Item
-//                     </button>
-//                 </div>
-//                 <div className='flex items-center justify-between'>
-//                     <button
-//                         type='submit'
-//                         className='bg-primary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-//                     >
-//                         Save
-//                     </button>
-//                     <button
-//                         type='button'
-//                         onClick={() => navigate('/orders')}
-//                         className='bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-//                     >
-//                         Cancel
-//                     </button>
-//                 </div>
-//             </form>
-//         </div>
-//     );
-// };
-
-// export default EditOrder;
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import OrderContext from '../../context/OrderContext/orderContext';
+import { TiMinus } from "react-icons/ti";
+import InventoryContext from '../../context/InventoryContext/inventoryContext';
 
 const EditOrder = () => {
+    const invContext = useContext(InventoryContext);
+    const { addInventory } = invContext;
+    const context = useContext(OrderContext);
+    const { orderList, editOrder, deleteOrderItem } = context;
     const { id } = useParams();
     const navigate = useNavigate();
+    const [orderId, setOrderId] = useState("");
     const [order, setOrder] = useState({
         id: '',
-        expectedDeliveryDate: '',
-        status: '',
-        vendorName: '',
-        contact: '',
-        paymentMethod: '',
-        paymentStatus: '',
-        items: [],
+        status: "",
+        deliveryStatus: "",
+        vendorName: "",
+        contact: "",
+        payMethod: "",
+        payStatus: "",
+        expectedDelivery: "",
+        transactionId: "",
+        items: []
     });
 
+    const checkDateForStatus = (date, status) => {
+        const newDate = new Date(date);
+        const currentDate = new Date();
+        if (status) return status;
+        if ((currentDate > newDate)) {
+            return 'Overdue';
+        } else {
+            return "Not Delivered";
+        }
+    };
+
     useEffect(() => {
-        axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`)
-            .then(response => {
-                const orderData = response.data;
+        if (id) {
+            const order = orderList.find(order => (order._id).toString() === (id).toString());
+            if (order) {
                 setOrder({
-                    id: orderData.id,
-                    date: orderData.date,
-                    deliveryDate: orderData.deliveryDate,
-                    status: orderData.status,
-                    items: orderData.items || [],
-                    totalPrice: orderData.totalPrice
+                    id: id,
+                    status: order.status,
+                    deliveryStatus: order.deliveryStatus,
+                    vendorName: order.vendorName,
+                    contact: order.contact,
+                    payMethod: order.payMethod,
+                    payStatus: order.payStatus,
+                    expectedDelivery: formatDate(order.expectedDelivery),
+                    transactionId: order.transactionId,
+                    items: order.items
                 });
-            })
-            .catch(error => console.error('Error fetching order:', error));
-    }, [id]);
+                setOrderId(order.orderId);
+            }
+        }
+    }, [id, orderList]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setOrder(prevOrder => ({
-            ...prevOrder,
-            [name]: value
-        }));
+        if (name === 'expectedDelivery') {
+            const expectedDeliveryDate = formatDate(value);
+            setOrder(prevOrder => ({
+                ...prevOrder,
+                [name]: expectedDeliveryDate
+            }));
+        } else {
+            setOrder(prevOrder => ({
+                ...prevOrder,
+                [name]: value
+            }));
+        }
     };
 
     const handleItemChange = (index, field, value) => {
@@ -222,26 +86,52 @@ const EditOrder = () => {
     const addItem = () => {
         setOrder(prevOrder => ({
             ...prevOrder,
-            items: [...prevOrder.items, { name: '', quantity: 1, unitCost: 0 }]
+            items: [...prevOrder.items, { name: '', quantity: 1, unitCost: 0, category: '', bool: false }]
         }));
     };
 
-    const removeItem = (index) => {
-        const updatedItems = order.items.filter((_, i) => i !== index);
-        setOrder(prevOrder => ({
-            ...prevOrder,
-            items: updatedItems
-        }));
+    const removeItem = (identifier) => {
+        setOrder(prevOrder => {
+            // Check if identifier is a number (index) or a string (ID)
+            if (typeof identifier === 'number') {
+                // Remove item by index
+                return {
+                    ...prevOrder,
+                    items: prevOrder.items.filter((_, index) => index !== identifier)
+                };
+            } else {
+                // Remove item by ID
+                return {
+                    ...prevOrder,
+                    items: prevOrder.items.filter(item => item._id && item._id.toString() !== identifier.toString())
+                };
+            }
+        });
     };
 
-    const handleSubmit = (event) => {
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        axios.put(`https://jsonplaceholder.typicode.com/posts/${id}`, order)
-            .then(response => {
-                console.log('Order updated successfully:', response.data);
-                navigate('/orders');
-            })
-            .catch(error => console.error('Error updating order:', error));
+        const { id, status, deliveryStatus, vendorName, contact, payMethod, payStatus, expectedDelivery, transactionId, items } = order;
+        const newDeliveryStatus = checkDateForStatus(expectedDelivery, deliveryStatus);
+        await editOrder(id, status, newDeliveryStatus, vendorName, contact, payMethod, payStatus, expectedDelivery, transactionId, items);
+        if (status === "Delivered") {
+            items.forEach(async (item) => {
+                if (item.bool === true || item.bool === "true") {
+                    await addInventory(item);
+                }
+            });
+        }
+        navigate('/orders');
+    };
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        return formattedDate;
     };
 
     return (
@@ -249,105 +139,231 @@ const EditOrder = () => {
             <h2 className="text-2xl font-semibold mb-4">Edit Order</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
-                    <label htmlFor="vendorName" className="block text-sm font-medium text-gray-700">Vendor Name:</label>
-                    <input type="text" id="vendorName" name="vendorName" value={order.vendorName} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                    <label
+                        htmlFor="vendorName"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Order Id:
+                    </label>
+                    <input
+                        type="text"
+                        id='orderId'
+                        value={orderId}
+                        disabled
+                        className="mt-1 p-2 border rounded-md w-full"
+                    />
                 </div>
                 <div className="mb-4">
-                    <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Vendor Contact:</label>
-                    <input type="text" id="contact" name="contact" value={order.contact} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                    <label
+                        htmlFor="status"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Status:
+                    </label>
+                    <select
+                        id="status"
+                        name="status"
+                        value={order.status}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    >
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
                 </div>
                 <div className="mb-4">
-                    <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">Payment Method:</label>
-                    <input type="text" id="paymentMethod" name="paymentMethod" value={order.paymentMethod} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                    <label
+                        htmlFor="vendorName"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Vendor Name:
+                    </label>
+                    <input
+                        type="text"
+                        id="vendorName"
+                        name="vendorName"
+                        value={order.vendorName}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    />
                 </div>
                 <div className="mb-4">
-                    <label htmlFor="paymentStatus" className="block text-sm font-medium text-gray-700">Payment Status:</label>
-                    <input type="text" id="paymentStatus" name="paymentStatus" value={order.paymentStatus} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                    <label
+                        htmlFor="contact"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Vendor Contact:
+                    </label>
+                    <input
+                        type="text"
+                        id="contact"
+                        name="contact"
+                        value={order.contact}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    />
                 </div>
                 <div className="mb-4">
-                    <label htmlFor="expectedDeliveryDate" className="block text-sm font-medium text-gray-700">Expected Delivery Date:</label>
-                    <input type="text" id="expectedDeliveryDate" name="expectedDeliveryDate" value={order.expectedDeliveryDate} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                    <label
+                        htmlFor="payMethod"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Payment Method:
+                    </label>
+                    <select
+                        id="payMethod"
+                        name="payMethod"
+                        value={order.payMethod}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    >
+                        <option value="COD">Cash on Delivery - COD</option>
+                        <option value="Bank Transfer">Bank to Bank - Bank Transfer</option>
+                        <option value="E Transfer">Electronic Transfer - E Transfer</option>
+                    </select>
                 </div>
                 <div className="mb-4">
-                    <h2 className='text-xl font-semibold'>Items</h2>
-                    {order.items && order.items.length !== 0
-                        &&
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th className='p-2'>Item Name</th>
-                                    <th className='p-2'>Quantity</th>
-                                    <th className='p-2'>Unit Cost</th>
-                                    <th className='p-2'></th>
-                                </tr>
-                            </thead>
-                            <tbody className='items-center mb-2'>
-                                {order.items.map((item, index) => (
-                                    <tr key={index}>
-                                        <td className='py-2'>
-                                            <input
-                                                type='text'
-                                                placeholder='Item Name'
-                                                className='mr-2 p-2 border rounded'
-                                                value={item.name}
-                                                onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                                            />
-                                        </td>
-                                        <td className='py-2'>
-                                            <input
-                                                type='number'
-                                                placeholder='Quantity'
-                                                className='mr-2 p-2 border rounded'
-                                                value={item.quantity}
-                                                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                            />
-                                        </td>
-                                        <td className='py-2'>
-                                            <input
-                                                type='number'
-                                                placeholder='Unit Cost'
-                                                className='mr-2 p-2 border rounded'
-                                                value={item.unitCost}
-                                                onChange={(e) => handleItemChange(index, 'unitCost', e.target.value)}
-                                            />
-                                        </td>
-                                        <td className='py-2'>
-                                            <button
-                                                type='button'
-                                                className='bg-red-500 text-white p-2 rounded'
-                                                onClick={() => removeItem(index)}
-                                            >
-                                                Remove
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    }
+                    <label htmlFor="payStatus" className="block text-sm font-medium text-gray-700">Payment Status:</label>
+                    <select
+                        id="payStatus"
+                        name="payStatus"
+                        value={order.payStatus}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    >
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
+                    </select>
+                </div>
+                <div className="mb-4">
+                    <label htmlFor="transactionId" className="block text-sm font-medium text-gray-700">Transaction Id:</label>
+                    <input
+                        type="text"
+                        id="transactionId"
+                        name="transactionId"
+                        placeholder='Transaction Id'
+                        value={order.transactionId}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label htmlFor="expectedDelivery" className="block text-sm font-medium text-gray-700">Expected Delivery Date:</label>
+                    <input
+                        type="date"
+                        id="expectedDelivery"
+                        name="expectedDelivery"
+                        value={order.expectedDelivery ? formatDate(order.expectedDelivery) : ''}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label
+                        htmlFor="deliveryStatus"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Delivery Status:
+                    </label>
+                    <select
+                        id="deliveryStatus"
+                        name="deliveryStatus"
+                        value={order.deliveryStatus}
+                        onChange={handleChange}
+                        className="mt-1 p-2 border rounded-md w-full"
+                    >
+                        <option value=" ">Change Delivery Status</option>
+                        <option value="On Time">On Time</option>
+                        <option value="Delayed">Delayed</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+                <div className="mb-4">
+                    <h3 className="text-lg font-medium mb-2">Items:</h3>
+                    {order.items.map((item, index) => (
+                        <div key={index} className="mb-4 border rounded-lg p-4">
+                            <div className="mb-2">
+                                <label htmlFor={`name-${index}`} className="block text-sm font-medium text-gray-700">Name:</label>
+                                <input
+                                    type="text"
+                                    id={`name-${index}`}
+                                    name={`name-${index}`}
+                                    value={item.name}
+                                    onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                                    className="mt-1 p-2 border rounded-md w-full"
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-gray-700">Quantity:</label>
+                                <input
+                                    type="number"
+                                    id={`quantity-${index}`}
+                                    name={`quantity-${index}`}
+                                    value={item.quantity}
+                                    onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                                    className="mt-1 p-2 border rounded-md w-full"
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor={`unitCost-${index}`} className="block text-sm font-medium text-gray-700">Unit Cost:</label>
+                                <input
+                                    type="number"
+                                    id={`unitCost-${index}`}
+                                    name={`unitCost-${index}`}
+                                    value={item.unitCost}
+                                    onChange={(e) => handleItemChange(index, 'unitCost', e.target.value)}
+                                    className="mt-1 p-2 border rounded-md w-full"
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor={`category-${index}`} className="block text-sm font-medium text-gray-700">Category:</label>
+                                <input
+                                    type="text"
+                                    id={`category-${index}`}
+                                    name={`category-${index}`}
+                                    value={item.category}
+                                    onChange={(e) => handleItemChange(index, 'category', e.target.value)}
+                                    className="mt-1 p-2 border rounded-md w-full"
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor={`bool-${index}`} className="block text-sm font-medium text-gray-700">Inventory:</label>
+                                <div className="flex">
+                                    <input
+                                        type="checkbox"
+                                        id={`bool-${index}`}
+                                        name={`bool-${index}`}
+                                        checked={item.bool}
+                                        onChange={(e) => handleItemChange(index, 'bool', e.target.checked)}
+                                        className="mt-1 p-2"
+                                    />
+                                    <span> - Add To Inventory</span>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => removeItem(item._id || index)}
+                                className="text-red-500 hover:text-red-700"
+                            >
+                                <TiMinus size={24} />
+                            </button>
+                        </div>
+                    ))}
                     <button
-                        type='button'
-                        className='bg-blue-500 text-white mt-4 p-2 rounded'
+                        type="button"
                         onClick={addItem}
+                        className="bg-blue-500 text-white p-2 rounded-md"
                     >
                         Add Item
                     </button>
                 </div>
-                <div className='flex items-center justify-between'>
-                    <button
-                        type='submit'
-                        className='bg-primary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                    >
-                        Save
-                    </button>
-                    <button
-                        type='button'
-                        onClick={() => navigate('/orders')}
-                        className='bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                    >
-                        Cancel
-                    </button>
-                </div>
+                <button
+                    type="submit"
+                    className="bg-green-500 text-white p-2 rounded-md"
+                >
+                    Save Order
+                </button>
             </form>
         </div>
     );

@@ -41,7 +41,7 @@ const ExpenseState = (props) => {
 
             setLoading(true);
 
-            const { date, expenseName, amount, category } = expenseData
+            const { date, expenseName, amount, category, orderNumber } = expenseData
 
             const res = await fetch(`${host}/api/expense/createexpense `, {
                 method: "POST",
@@ -49,7 +49,7 @@ const ExpenseState = (props) => {
                     "Content-Type": "application/json"
                 },
                 credentials: 'include',
-                body: JSON.stringify({ date, expenseName, amount, category }),
+                body: JSON.stringify({ date, expenseName, amount, category, orderNumber }),
             });
 
 
@@ -76,7 +76,7 @@ const ExpenseState = (props) => {
         try {
             setLoading(true);
 
-            const { date, expenseName, amount, category } = expenseData;
+            const { date, expenseName, amount, category, orderNumber } = expenseData;
 
             const res = await fetch(`${host}/api/expense/editexpense/${id}`, {
                 method: "PUT",
@@ -84,7 +84,7 @@ const ExpenseState = (props) => {
                     "Content-Type": "application/json"
                 },
                 credentials: 'include',
-                body: JSON.stringify({ date, expenseName, amount, category }),
+                body: JSON.stringify({ date, expenseName, amount, category, orderNumber }),
             });
 
 
