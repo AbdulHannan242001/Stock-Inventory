@@ -1,6 +1,5 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
 
 const DoughnutChart = ({ inventory }) => {
     const categories = inventory && [...new Set(inventory.map(item => item.category))];
