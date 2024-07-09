@@ -42,7 +42,7 @@ const InventoryState = (props) => {
         }
     }
 
-    const addInventory = async (formData) => {
+    const addInventory = async (formData, methode) => {
         try {
             setLoading(true);
 
@@ -57,22 +57,54 @@ const InventoryState = (props) => {
                 bool = true
             }
 
-            const findItem = inventoryData.find((item) => toTitleCase(item.name) === toTitleCase(name) && toTitleCase(item.category) === toTitleCase(category) && (parseInt(item.price) === parseInt(price) || parseInt(item.price) === parseInt(newPrice)));
+            const findItem = inventoryData.find((item) => toTitleCase(item.name) === toTitleCase(name) && toTitleCase(item.category) === toTitleCase(category) && (parseInt(item.unitCost) === parseInt(unitCost)));
 
-            if (findItem) {
+            if (findItem && methode === "Added") {
                 let formData;
-                const totalQuantity = parseFloat(findItem.quantity) + parseFloat(quantity);
+                let totalQuantity;
+                totalQuantity = parseFloat(findItem.quantity) + parseFloat(quantity);
+
 
                 formData = {
                     name: toTitleCase(findItem.name),
                     quantity: totalQuantity,
                     price: findItem.price,
+                    unitCost: findItem.unitCost,
                     category: toTitleCase(findItem.category),
+                    itemQuantity: quantity,
+                    itemPrice: unitCost,
                     lowStockThreshold: findItem.lowStockThreshold,
                     bool
                 }
 
-                await editInventory(findItem._id, formData);
+                await editInventory(findItem._id, formData, methode);
+                return;
+            } else if (methode === "Removed") {
+                const findItem = inventoryData.find((item) => toTitleCase(item.name) === toTitleCase(name) && toTitleCase(item.category) === toTitleCase(category))
+                let formData;
+                let totalQuantity;
+
+                totalQuantity = parseFloat(findItem.quantity) - parseFloat(quantity);
+
+
+                if (findItem.quantity < quantity) {
+                    toast.error("Quantity cannot be greater than inventory quantity");
+                    return;
+                }
+
+                formData = {
+                    name: toTitleCase(findItem.name),
+                    quantity: totalQuantity,
+                    price: findItem.price,
+                    unitCost: findItem.unitCost,
+                    category: toTitleCase(findItem.category),
+                    itemQuantity: quantity,
+                    itemPrice: parseFloat(unitCost) * parseFloat(quantity),
+                    lowStockThreshold: findItem.lowStockThreshold,
+                    bool
+                }
+
+                await editInventory(findItem._id, formData, methode);
                 return;
             }
 
@@ -86,9 +118,11 @@ const InventoryState = (props) => {
                     {
                         name: toTitleCase(name),
                         quantity,
+                        unitCost,
                         price: newPrice,
                         category: toTitleCase(category),
-                        lowStockThreshold: lowStockThreshold ? lowStockThreshold : 5
+                        lowStockThreshold: lowStockThreshold ? lowStockThreshold : 5,
+                        methode
                     }
                 )
             });
@@ -112,9 +146,9 @@ const InventoryState = (props) => {
         }
     }
 
-    const editInventory = async (id, formData) => {
+    const editInventory = async (id, formData, methode) => {
         try {
-            const { name, quantity, price, category, lowStockThreshold } = formData;
+            const { name, quantity, price, category, unitCost, lowStockThreshold, itemQuantity, itemPrice } = formData;
 
             const res = await fetch(`${host}/api/inventory/editInventory/${id}`, {
                 method: 'PUT',
@@ -122,7 +156,17 @@ const InventoryState = (props) => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ name: toTitleCase(name), quantity, price, category: toTitleCase(category), lowStockThreshold })
+                body: JSON.stringify({
+                    name: toTitleCase(name),
+                    quantity,
+                    price,
+                    unitCost,
+                    category: toTitleCase(category),
+                    lowStockThreshold,
+                    itemQuantity,
+                    itemPrice,
+                    methode
+                })
             });
 
             const data = await res.json();

@@ -224,6 +224,7 @@ const Inventory = () => {
                                 <td className='text-center p-2'>${item.price}</td>
                                 <td className='text-center p-2'>
                                     <Link to={`/inv/edit/${item._id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>Edit</Link>
+                                    <Link to={`/inv/view/${item._id}`} className='text-accent-green hover:text-accent-darkgreen mx-2'>View</Link>
                                     <button onClick={() => handleDelete(item._id)} className='text-accent-red hover:text-accent-darkred mx-2'>Delete</button>
                                     {item.quantity <= item.lowStockThreshold && (
                                         <button onClick={() => openModal()} className='text-accent-blue hover:text-accent-darkblue mx-2'>Reorder</button>

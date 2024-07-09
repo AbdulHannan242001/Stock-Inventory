@@ -13,14 +13,23 @@ export const getInventory = async (req, res) => {
 export const addInventory = async (req, res) => {
     try {
 
-        const { name, quantity, price, category, lowStockThreshold } = req.body;
+        const { name, quantity, unitCost, price, category, lowStockThreshold, methode } = req.body;
+        const log = [{
+            name,
+            quantity,
+            price: unitCost,
+            date: new Date(),
+            methode
+        }];
 
         const newInventory = new InventoryModal({
             name,
             quantity,
             price,
+            unitCost,
             category,
-            lowStockThreshold
+            lowStockThreshold,
+            inventoryLog: log,
         });
 
         await newInventory.save();
@@ -37,7 +46,7 @@ export const editInventory = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { name, quantity, price, category, lowStockThreshold } = req.body;
+        const { name, quantity, unitCost, price, category, lowStockThreshold, itemQuantity, itemPrice, methode } = req.body;
 
         if (!id) return res.status(400).json({ message: "ID not found" });
 
@@ -45,22 +54,22 @@ export const editInventory = async (req, res) => {
 
         if (!invenLog) return res.status(404).json({ message: "Inventory not found" });
 
-        const log = invenLog.inventoryLog.push({
+        invenLog.inventoryLog.push({
             name,
-            quantity,
-            price,
-            category,
+            quantity: itemQuantity,
+            price: itemPrice,
+            date: new Date(),
+            methode,
         });
 
-        const updatedInventory = await InventoryModal.findByIdAndUpdate(id, {
-            name,
-            quantity,
-            price,
-            category,
-            lowStockThreshold,
-            inventoryLog: log
+        invenLog.name = name;
+        invenLog.quantity = quantity;
+        invenLog.price = price;
+        invenLog.unitCost = unitCost;
+        invenLog.category = category;
+        invenLog.lowStockThreshold = lowStockThreshold;
 
-        }, { new: true });
+        const updatedInventory = await invenLog.save();
 
         if (!updatedInventory) return res.status(404).json({ message: "Inventory not found" });
 

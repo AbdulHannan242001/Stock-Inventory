@@ -23,9 +23,10 @@ const OrderList = () => {
 
     useEffect(() => {
         const today = new Date();
+        const tommorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
         orderList.forEach((order) => {
             const date = new Date(order.expectedDelivery);
-            if (date < today && order.deliveryStatus !== 'Overdue') {
+            if (date >= tommorrow && order.deliveryStatus !== 'Overdue') {
                 changeDeliveryStatus(order._id, 'Overdue');
             }
         })

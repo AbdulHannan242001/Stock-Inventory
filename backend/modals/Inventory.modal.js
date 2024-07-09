@@ -13,6 +13,10 @@ const InventorySchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    unitCost: {
+        type: Number,
+        required: true
+    },
     category: {
         type: String,
         required: true
@@ -34,6 +38,15 @@ const InventorySchema = new mongoose.Schema({
             type: Number,
             required: true
         },
+        methode: {
+            type: String,
+            enum: ['Added', 'Removed'],
+            required: true
+        },
+        date: {
+            type: Date,
+            required: true
+        }
     },
     { timestamps: true }
     ]

@@ -17,7 +17,7 @@ const CreateForm = ({
 }) => {
     const newBool = boolean ? boolean : false
     return (
-        <div className="w-2/4 mx-auto p-4 pt-6 md:p-6 md:pt-12 bg-white shadow-lg rounded-lg">
+        <div className="w-3/4 mx-auto p-4 pt-6 md:p-6 md:pt-12 bg-white shadow-lg rounded-lg">
             <h1 className="text-3xl font-semibold text-center text-primary-dark">{formTitle}</h1>
             <form onSubmit={onSubmit}>
                 {formFields.map(field => (

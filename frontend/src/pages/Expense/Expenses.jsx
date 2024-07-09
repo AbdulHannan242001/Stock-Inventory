@@ -426,7 +426,7 @@ const Expenses = () => {
     const groupExpensesByTime = (expenses, timeGrouping) => {
         const uniqueCategory = getUniqueCategory();
         return expenses.reduce((acc, expense) => {
-            const date = new Date(new Date(expense.date));
+            const date = new Date(expense.date);
             const timeKey = moment(date, 'MM/DD/YYYY').startOf(timeGrouping).format(timeGrouping === 'months' ? 'MMMM YYYY' : 'ww YYYY');
             if (!acc[timeKey]) {
                 uniqueCategory.forEach((category) => {
@@ -451,7 +451,6 @@ const Expenses = () => {
         'rgba(51, 87, 255', 'rgba(255, 51, 161', 'rgba(161, 255, 51', 'rgba(51, 255, 246', 'rgba(255, 145, 51',
         'rgba(145, 51, 255', 'rgba(51, 255, 145', 'rgba(145, 51, 255', 'rgba(51, 161, 255', 'rgba(246, 51, 255'
     ];
-
 
     const handleChartData = () => {
         let dataSet = [];

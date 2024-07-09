@@ -92,15 +92,12 @@ const EditOrder = () => {
 
     const removeItem = (identifier) => {
         setOrder(prevOrder => {
-            // Check if identifier is a number (index) or a string (ID)
             if (typeof identifier === 'number') {
-                // Remove item by index
                 return {
                     ...prevOrder,
                     items: prevOrder.items.filter((_, index) => index !== identifier)
                 };
             } else {
-                // Remove item by ID
                 return {
                     ...prevOrder,
                     items: prevOrder.items.filter(item => item._id && item._id.toString() !== identifier.toString())
@@ -118,7 +115,15 @@ const EditOrder = () => {
         if (status === "Delivered") {
             items.forEach(async (item) => {
                 if (item.bool === true || item.bool === "true") {
-                    await addInventory(item);
+                    const formData = {
+                        name: item.name,
+                        quantity: item.quantity,
+                        unitCost: item.unitCost,
+                        price: item.unitCost * item.quantity,
+                        category: item.category,
+                        lowStockThreshold: item.lowStockThreshold ? item.lowStockThreshold : 5
+                    }
+                    await addInventory(formData, "Added");
                 }
             });
         }

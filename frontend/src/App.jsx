@@ -27,6 +27,7 @@ import EditInventory from "./pages/Inventory/EditInventory";
 import EditOrder from "./pages/Order/EditOrder";
 import CreateOrder from "./pages/Order/CreateOrder";
 import AdvancedReporting from "./pages/Report/AdvancedReporting";
+import ViewInventory from "./pages/Inventory/ViewInventory";
 
 function App() {
   const getUser = JSON.parse(localStorage.getItem("logged-in-user"))
@@ -72,6 +73,7 @@ function App() {
                               <Route path="/inv" element={authUser ? <Inventory /> : <Navigate to="/" />} />
                               <Route path="/inv/new" element={authUser ? <AddInventory /> : <Navigate to="/" />} />
                               <Route path="/inv/edit/:id" element={authUser ? <EditInventory /> : <Navigate to="/" />} />
+                              <Route path="/inv/view/:id" element={authUser ? <ViewInventory /> : <Navigate to="/" />} />
                               <Route path="/orders" element={authUser ? <OrderList /> : <Navigate to="/" />} />
                               <Route path="/orders/:id" element={authUser ? <ViewOrder /> : <Navigate to="/" />} />
                               <Route path="/orders/edit/:id" element={authUser ? <EditOrder /> : <Navigate to="/" />} />

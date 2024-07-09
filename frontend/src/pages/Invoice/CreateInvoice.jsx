@@ -2,8 +2,11 @@ import React, { useState, useContext, useEffect } from 'react';
 import CreateForm from '../../components/CreateForm';
 import InvoiceContext from '../../context/InvoiceContext/invoiceContext';
 import { toast } from 'react-hot-toast';
+import InventoryContext from '../../context/InventoryContext/inventoryContext';
 
 const CreateInvoice = () => {
+    const invContext = useContext(InventoryContext);
+    const { addInventory, inventoryData } = invContext
     const context = useContext(InvoiceContext);
     const { createInvoice } = context;
     const [bool, setBool] = useState(true);
@@ -14,7 +17,7 @@ const CreateInvoice = () => {
         status: '',
     });
 
-    const [items, setItems] = useState([{ name: '', quantity: 0, unitCost: 0 }]);
+    const [items, setItems] = useState([{ name: '', quantity: 0, unitCost: 0, category: '' }]);
 
     const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.unitCost, 0);
 
@@ -43,7 +46,7 @@ const CreateInvoice = () => {
         } else {
             setBool(false);
         }
-    }, [status,totalPrice]);
+    }, [status, totalPrice]);
 
     const handleItemChange = (index, field, value) => {
         const newItems = [...items];
@@ -52,7 +55,7 @@ const CreateInvoice = () => {
     };
 
     const addItem = () => {
-        setItems([...items, { name: '', quantity: 0, unitCost: 0 }]);
+        setItems([...items, { name: '', quantity: 0, unitCost: 0, category: '' }]);
     };
 
     const removeItem = (index) => {
@@ -77,21 +80,42 @@ const CreateInvoice = () => {
             [name]: value,
         }));
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!checkData(invoice, items)) {
             toast.error('Please fill all the fields');
             return;
         }
+
+        items.forEach((item) => {
+            const findInInventory = inventoryData.find((i) => i.name === item.name && i.category === item.category);
+            if (!findInInventory) {
+                toast.error('Item not found in inventory');
+                return;
+            }
+        })
+
         await createInvoice(invoice, items);
+
+        items.forEach(async (item) => {
+            const formData = {
+                date: new Date(),
+                name: item.name,
+                price: item.quantity * item.unitCost,
+                unitCost: item.unitCost,
+                category: item.category,
+                quantity: item.quantity
+            };
+            await addInventory(formData, "Removed");
+        });
+
         setInvoice({
             customer: '',
             amount: 0,
             paid: 0,
             status: '',
         })
-        setItems([{ name: '', quantity: 0, unitCost: 0 }])
+        setItems([{ name: '', quantity: 0, unitCost: 0, category: '' }])
     };
 
     const invoiceFormFields = [
