@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { confirmAlert } from 'react-confirm-alert';
 import moment from 'moment';
 import ExpenseContext from '../../context/ExpenseContext/expenseContext';
 
 const Expenses = () => {
     const context = useContext(ExpenseContext);
-    const { expense } = context;
+    const { expense, deleteExpense } = context;
     const [expenses, setExpenses] = useState([]);
     const [filteredExpenses, setFilteredExpenses] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -333,7 +334,7 @@ const Expenses = () => {
                             <td className="text-center p-2">{expense.expenseName}</td>
                             <td className="text-center p-2">{expense.category}</td>
                             <td className="text-center p-2">${expense.amount.toFixed(2)}</td>
-                            <td className="text-center p-2 text-red-700"><button onClick={handleDelete}>Delete</button></td>
+                            <td className="text-center p-2 text-red-700"><button onClick={() => handleDelete(expense._id)}>Delete</button></td>
                         </tr>
                     ))}
                 </tbody>

@@ -3,9 +3,13 @@ import { Doughnut } from 'react-chartjs-2';
 
 const DoughnutChart = ({ inventory }) => {
     const categories = inventory && [...new Set(inventory.map(item => item.category))];
-    const categorySales = categories && categories.map(category => {
-        const categoryItems = inventory.filter(item => item.category === category);
-        return categoryItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+    const categorySales = inventory.map(item => {
+        return item.inventoryLog.reduce((itemTotal, log) => {
+            if (log.methode === "Removed") {
+                return itemTotal + (log.quantity * log.price);
+            }
+            return itemTotal;
+        }, 0);
     });
 
     const data = {

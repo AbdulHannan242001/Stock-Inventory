@@ -8,12 +8,27 @@ const LineChart = ({ inventory }) => {
 
     const handleSelect = (range) => {
         setTimeRange(range);
-        // Logic to update the data based on range
     };
 
     const labels = inventory.map(item => item.name);
-    const salesData = inventory.map(item => item.price * item.quantity);
-    const purchaseData = salesData.map(value => value * 0.75); // assuming 75% of sales as purchases for illustration
+
+    const salesData = inventory.map(item => {
+        return item.inventoryLog.reduce((itemTotal, log) => {
+            if (log.methode === "Removed") {
+                return itemTotal + (log.quantity * log.price);
+            }
+            return itemTotal;
+        }, 0);
+    });
+
+    const purchaseData = inventory.map(item => {
+        return item.inventoryLog.reduce((itemTotal, log) => {
+            if (log.methode === "Added") {
+                return itemTotal + (log.quantity * log.price);
+            }
+            return itemTotal;
+        }, 0);
+    });
 
     const data = {
         labels,
@@ -21,15 +36,17 @@ const LineChart = ({ inventory }) => {
             {
                 label: 'Sales',
                 data: salesData,
-                borderColor: 'rgba(75, 192, 192)',
-                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
                 tension: 0.1,
             },
             {
                 label: 'Purchases',
                 data: purchaseData,
-                borderColor: 'rgba(153, 102, 255)',
-                fill: false,
+                borderColor: 'rgba(153, 102, 255, 1)',
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                fill: true,
                 tension: 0.1,
             },
         ],
@@ -44,9 +61,9 @@ const LineChart = ({ inventory }) => {
             },
             x: {
                 grid: {
-                    display: false
+                    display: false,
                 },
-            }
+            },
         },
     };
 
