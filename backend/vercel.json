@@ -1,0 +1,26 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/server.js"
+        }
+    ],
+    "env": {
+        "PORT": 8000,
+        "MONGO_URI": "mongodb+srv://webdo2016:9FmBEYr6H38aMBYW@cluster0.w3bj0bw.mongodb.net/Stock-Inventory-Management-System?retryWrites=true&w=majority",
+        "JWT_SECRET": "I@mag()()d|3()Y",
+        "NODE_ENV": "development",
+        "PEPPER": "S@LT&P3PP3R",
+        "SALT": 10
+    },
+    "buildCommand": "echo 'No build command required'",
+    "installCommand": "npm install",
+    "startCommand": "npm run server"
+}
