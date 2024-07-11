@@ -16,7 +16,7 @@ const Expenses = () => {
     const [uniqueCategory, setUniqueCategory] = useState({});
     const [selectedCategory, setSelectedCategory] = useState('');
     const [timeGrouping, setTimeGrouping] = useState('months');
-    const [selectedMonth, setSelectedMonth] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState(' ');
     const [filteredMonthExpenses, setFilteredMonthExpenses] = useState([]);
     const [totalExpense, setTotalExpense] = useState(0);
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -82,7 +82,6 @@ const Expenses = () => {
             })
         });
         setUniqueMonths(results);
-        setSelectedMonth(results[0]);
     }, [expenses]);
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -99,7 +98,6 @@ const Expenses = () => {
     const handleMonthFilter = (e) => {
         const selectedMonthIndex = e.target.value;
         setSelectedMonth(selectedMonthIndex);
-
         const filteredExpenses = expenses.filter((expense) => {
             const expenseDate = new Date(expense.date);
             return expenseDate.getMonth() === parseInt(selectedMonthIndex);
@@ -122,9 +120,15 @@ const Expenses = () => {
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
     useEffect(() => {
+        if (selectedMonth === "") {
+            const totalExpenseByMonth = expense.reduce((sum, expense) => sum + expense.amount, 0);
+            setTotalExpense(totalExpenseByMonth);
+            return;
+        }
         const totalExpenseByMonth = filteredMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
         setTotalExpense(totalExpenseByMonth);
     }, [selectedMonth, expenses]);
+
     const categoryExpense = filteredMonthExpenses.reduce((acc, expense) => {
         acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
         return acc;
@@ -266,7 +270,7 @@ const Expenses = () => {
                             value={selectedMonth}
                             onChange={handleMonthFilter}
                         >
-                            <option value="">-------</option>
+                            <option value=" ">-------</option>
                             {uniqueMonths.length > 0 && uniqueMonths.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
@@ -276,7 +280,7 @@ const Expenses = () => {
                     </div>
                     <div className="border-2 rounded-lg shadow-lg p-4 bg-gray-100">
                         <h2 className="text-center font-semibold text-primary-dark">Total Expense</h2>
-                        <p className="text-center text-2xl font-semibold py-2 text-secondary-dark">${totalExpense.toFixed(2)}
+                        <p className="text-center text-2xl font-semibold py-2 text-secondary-dark">${selectedMonth === " " ? expense.reduce((sum, expense) => sum + expense.amount, 0) : totalExpense.toFixed(2)}
                         </p>
                     </div>
                     <div className="border-2 rounded-lg shadow-lg p-4 bg-gray-100">

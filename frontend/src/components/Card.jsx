@@ -11,9 +11,9 @@ const Card = ({ title, value, icon, num, svg }) => {
                 <h1 className='text-3xl font-bold'>{value}</h1>
             </div>
             <div className='w-full py-2 flex text-xs space-x-3 items-center'>
-                <i className='text-secondary-dark text-lg'>{icon}</i>
+                {/* <i className='text-secondary-dark text-lg'>{icon}</i>
                 <p className='text-secondary-dark font-semibold'>{num}%</p>
-                <p className='text-neutral-mediumGray font-semibold'>Than Last Month</p>
+                <p className='text-neutral-mediumGray font-semibold'>Than Last Month</p> */}
             </div>
         </div>
     )
