@@ -35,3 +35,9 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
     connectToMongoDB();
 });
+
+app.use('/', (req, res) => {
+    res.send('Backend Server is running...');
+});
+
+export default app;
