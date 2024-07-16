@@ -25,7 +25,6 @@ const OrderState = (props) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'auth-token': authUser.token
                 },
                 credentials: 'include'
             });

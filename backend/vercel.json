@@ -18,7 +18,8 @@
         "JWT_SECRET": "I@mag()()d|3()Y",
         "NODE_ENV": "development",
         "PEPPER": "S@LT&P3PP3R",
-        "SALT": "10"
+        "SALT": "10",
+        "CLIENT_URL": "https://stock-inventory-frontend.vercel.app"
     },
     "buildCommand": "echo 'No build command required'",
     "installCommand": "npm install"
