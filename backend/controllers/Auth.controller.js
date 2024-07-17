@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import User from '../models/User.model.js';
+import User from '../modals/User.modal.js';
 import generateTokenAndSetCookie from '../utils/generateToken.js';
 
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
