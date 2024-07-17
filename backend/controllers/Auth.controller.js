@@ -1,15 +1,13 @@
-// Auth Controller js
-
 import bcrypt from 'bcrypt';
-import User from '../modals/User.modal.js';
+import User from '../models/User.model.js';
 import generateTokenAndSetCookie from '../utils/generateToken.js';
 
-
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10;
+const PEPPER = process.env.PEPPER || 'default_pepper';
+
 const addSaltAndPepper = async (password) => {
-    const salt = bcrypt.genSaltSync(SALT_ROUNDS);
-    const pepper = process.env.PEPPER || 'default_pepper';
-    const hashedPassword = bcrypt.hashSync(password + pepper, salt);
+    const salt = await bcrypt.genSalt(SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password + PEPPER, salt);
     return hashedPassword;
 };
 
@@ -17,120 +15,85 @@ export const register = async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body;
 
-        const isValid = checkInfo(name, email);
-
-        if (!isValid) return res.status(400).json({ message: "Missing name or email" });
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
 
         const existingUser = await User.findOne({ email });
-
-        if (existingUser) return res.status(400).json({ message: "User already exists" });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
 
         const hashedPassword = await addSaltAndPepper(password);
-
-        const profilePic = `https://avatar.iran.liara.run/username?username=${firstName}+${lastName}`
+        const profilePic = `https://avatar.iran.liara.run/username?username=${firstName}+${lastName}`;
 
         const newUser = new User({
             firstName,
             lastName,
             email,
             profilePic,
-            password: hashedPassword
+            password: hashedPassword,
         });
 
         await newUser.save();
-
         generateTokenAndSetCookie(newUser._id, res);
 
         res.status(201).json({
             _id: newUser._id,
-            name: newUser.name,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
             email: newUser.email,
             profilePic: newUser.profilePic,
             createdAt: newUser.createdAt,
-            updatedAt: newUser.updatedAt
+            updatedAt: newUser.updatedAt,
         });
-
-
     } catch (error) {
         console.error("Error registering user:", error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
 
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const isValid = checkLoginInfo(email, password);
-
-        if (!isValid) return res.status(400).json({ message: "Missing email or password" });
+        if (!email || !password) {
+            return res.status(400).json({ message: "Missing email or password" });
+        }
 
         const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist" });
+        }
 
-        if (!user) return res.status(400).json({ message: "User does not exist" });
-
-        const pepper = process.env.PEPPER || 'default_pepper';
-
-        const isMatch = bcrypt.compareSync(password + pepper, user.password);
-
-        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+        const isMatch = await bcrypt.compare(password + PEPPER, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
 
         generateTokenAndSetCookie(user._id, res);
 
         res.status(200).json({
             _id: user._id,
-            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             profilePic: user.profilePic,
             createdAt: user.createdAt,
-            updatedAt: user.updatedAt
+            updatedAt: user.updatedAt,
         });
-
     } catch (error) {
         console.error("Error in login:", error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
 
-export const logout = async (req, res) => {
+export const logout = (req, res) => {
     try {
         res.clearCookie("jwt");
         res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
-        console.error("Error registering user:", error);
-        res.status(500).json({ message: error.message });
+        console.error("Error logging out:", error);
+        res.status(500).json({ message: "Server error" });
     }
-}
-
-
-
-
-
-
-function checkLoginInfo(email, password) {
-    if (!email || !password) {
-        console.log("Missing email or password");
-        return false;
-    }
-    if (!email.includes("@")) {
-        console.log("Invalid email");
-        return false;
-    }
-    return true;
-}
-
-function checkInfo(name, email) {
-    if (!name || !email) {
-        console.log("Missing name or email");
-        return false;
-    }
-    if (name < 3) {
-        console.log("Name too short");
-        return false;
-    }
-    if (!email.includes("@")) {
-        console.log("Invalid email");
-        return false;
-    }
-    return true;
-}
+};
