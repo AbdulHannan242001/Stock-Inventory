@@ -1,7 +1,7 @@
 // INVOICE ROUTE
 import express from 'express';
 import fetchUser from '../middleware/fetchUser.js';
-import { getInvoice, createInvoice, deleteInvoice, editInvoice } from '../controllers/Iinvoice.controller.js';
+import { getInvoice, createInvoice, deleteInvoice, editInvoice } from '../controllers/Invoice.controller.js';
 
 const router = express.Router();
 
