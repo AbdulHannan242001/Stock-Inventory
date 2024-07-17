@@ -33,7 +33,7 @@ app.use('/api/order', OrderRoute);
 app.use('/api/expense', ExpenseRoute);
 
 app.use('/', (req, res) => {
-    res.send('Backend Server is running...');
+    res.send('Backend Server is running... Welcome to Stock Inventory Management System');
 });
 
 app.listen(port, () => {
