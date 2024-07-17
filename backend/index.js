@@ -21,25 +21,21 @@ app.use(cookieParser());
 
 console.log('Client URL:', process.env.CLIENT_URL);
 
-// Configure CORS
 app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
 }));
 
-// Define routes
 app.use('/api/auth', AuthRoute);
 app.use('/api/inventory', InventoryRoute);
 app.use('/api/invoice', InvoiceRoute);
 app.use('/api/order', OrderRoute);
 app.use('/api/expense', ExpenseRoute);
 
-// Handle root route
 app.use('/', (req, res) => {
     res.send('Backend Server is running...');
 });
 
-// Start server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
     connectToMongoDB();
