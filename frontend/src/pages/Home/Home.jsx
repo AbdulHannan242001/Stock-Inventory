@@ -45,6 +45,7 @@ const Home = () => {
 
     const calculateTotal = (data, method) => data.reduce((total, item) => {
         const filteredLog = item.inventoryLog.filter(log => log.methode === method);
+        if (method === 'Added') console.log(filteredLog)
         const sum = filteredLog.reduce((subTotal, log) => subTotal + (log.price * log.quantity), 0);
         return total + sum;
     }, 0).toFixed(2);
@@ -119,7 +120,7 @@ const Home = () => {
 
     return (
         <div className='w-full'>
-            <div className='w-full flex justify-around gap-x-4 p-4'>
+            <div className='grid grid-cols-5 justify-around gap-x-4 p-4'>
                 <Card
                     title={"Total Sales"}
                     value={`$${totalSales}`}

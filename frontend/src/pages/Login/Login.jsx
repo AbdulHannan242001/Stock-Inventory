@@ -22,7 +22,7 @@ const Login = ({ authUser }) => {
         e.preventDefault();
 
         const { email, password } = data;
-        
+
         await login(email, password);
     }
     return (
