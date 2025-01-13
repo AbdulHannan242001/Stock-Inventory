@@ -2,8 +2,8 @@ import React from 'react'
 
 const Card = ({ title, value, icon, num, svg }) => {
     return (
-        <div className='w-3/12 shadow-lg bg-white rounded-lg py-3 px-12'>
-            <div className='w-3/12 rounded-lg bg-secondary-dark p-2'>
+        <div className='shadow-lg bg-white rounded-lg py-3 px-6'>
+            <div className='w-4/12 rounded-lg bg-secondary p-2'>
                 <img src={svg} alt="" className='h-[4vh] w-[4.5vh] mx-auto' />
             </div>
             <div className='w-full py-2'>
