@@ -97,3 +97,28 @@ export const logout = (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        if (!email || !newPassword) {
+            return res.status(400).json({ message: "Missing email or new password" });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist" });
+        }
+
+        const hashedPassword = await addSaltAndPepper(newPassword);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+        console.error("Error resetting password:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
